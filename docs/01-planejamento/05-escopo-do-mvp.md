@@ -38,6 +38,7 @@ O recrutamento prioriza esse perfil, mesmo que sejam poucas pessoas. O número m
 | US-11 | Saber o que é gravado |
 | US-12 | Pedir a exclusão dos dados |
 | US-17 | Drop set como uma única série com etapas |
+| US-18 | Aquecimento registrado como tipo da série (trabalho, aquecimento, preparatória); fora da evolução. Decisão em `decisoes/2026-10-26-aquecimento-registrado.md` |
 | US-19 | Consultar a evolução por comando (uso medido no teste) |
 | RNF-01 a RNF-05 | Confiar no histórico, não perder nem duplicar, privacidade e segurança, respeitar o orçamento, responder rápido |
 
@@ -87,5 +88,6 @@ Critérios do teste, com números ainda por definir antes de começar:
 
 ## Decisões pendentes
 
-- US-18 (separar aquecimento): entra ou vai para o Pós-MVP? Só 2 de 20 anotam aquecimento.
 - Valores dos critérios de sucesso acima.
+- Janela de contexto da US-02 (por quanto tempo o bot guarda o último exercício citado).
+- Revisar as US-03 e US-04 para mostrar o tipo da série (decisão da US-18).
