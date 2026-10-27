@@ -40,6 +40,8 @@ Fase: MVP.
 - Dado um relato registrado, quando recebo a confirmação, então ela mostra a data, o exercício e as séries, com "~" nos valores aproximados e "—" no que não foi dito (nunca 0).
 - Dado um exercício fora do catálogo, quando recebo a confirmação, então o bot avisa que não o reconheceu e a série continua salva.
 
+A revisar (26/10/2026): a confirmação passa a mostrar o tipo da série (decisão da US-18).
+
 ### US-17 Registrar um drop set como uma única série
 
 Como praticante com ficha, quero relatar um drop set ("20 no supino, tirei peso e fiz mais 10, tirei de novo e fiz 8"), para que a série não vire várias séries soltas no histórico.
@@ -49,14 +51,17 @@ Fase: MVP. Aparece nos relatos do formulário.
 - Dado que a carga de uma etapa não foi dita, quando o relato é salvo, então ela fica vazia, nunca repetida da etapa anterior.
 - Dado o drop set registrado, quando recebo a confirmação, então ela mostra as etapas separadas, para eu conferir.
 
-### US-18 Separar o aquecimento das séries de trabalho
+### US-18 Registrar o aquecimento como tipo da série
 
-Como praticante com ficha, quero que as séries de aquecimento fiquem marcadas como aquecimento, para que não contem como minha carga de trabalho.
+Como praticante com ficha, quero que as séries de aquecimento fiquem registradas e marcadas como aquecimento, para consultar com quanto aqueci sem que isso conte como minha carga de trabalho.
 
-Fase: pendente (MVP ou Pós-MVP). Só 2 de 20 respondentes anotam aquecimento.
-- Dado um relato com aquecimento ("aqueci com 20kg, depois 3x40"), quando envio, então a série leve fica marcada como aquecimento e as demais como de trabalho.
-- Dado que não está claro se uma série é de aquecimento, quando o relato é salvo, então o bot pergunta em vez de decidir sozinho.
-- Dado que consulto a última carga, quando vejo o resultado, então as séries de aquecimento não são tratadas como a carga de trabalho.
+Fase: MVP. Decidido em 26/10/2026 (ver docs/decisoes/2026-10-26-aquecimento-registrado.md).
+- Dado um relato com aquecimento dito ("aqueci com 20kg, depois 3x40"), quando envio, então a série leve fica registrada com tipo aquecimento e as demais com tipo trabalho.
+- Dado que não disse que a série era de aquecimento ou preparatória, quando o relato é salvo, então ela é de trabalho; o bot não pergunta nem deduz pelo peso.
+- Dado um relato registrado, quando recebo a confirmação, então ela mostra o tipo das séries que não são de trabalho.
+- Dado que consulto com /carga, quando vejo o resultado, então as séries de aquecimento aparecem marcadas como aquecimento.
+- Dado que consulto a evolução (US-19), quando vejo o resultado, então só séries de trabalho entram.
+- Dado um aquecimento geral sem exercício (esteira, mobilidade), quando o relato é salvo, então ele vai para a observação do dia.
 
 ## Épico 2: Consultar treinos anteriores
 
@@ -69,6 +74,8 @@ Fase: MVP.
 - Dado um nome que serve para mais de um exercício, quando envio o comando, então o bot lista as opções em vez de escolher uma.
 - Dado que existem registros desfeitos, quando consulto, então eles não aparecem.
 - Dado que existem outros testadores, quando consulto, então vejo apenas os meus dados.
+
+A revisar (26/10/2026): a confirmação passa a mostrar o tipo da série (decisão da US-18).
 
 ### US-05 Perguntar em texto livre
 
