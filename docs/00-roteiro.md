@@ -11,8 +11,13 @@
 - Decisões registradas: [pasta](decisoes/)
 - Pendências herdadas da Fase 1: ver "Decisões pendentes" no escopo e "Próximo passo de pesquisa" no levantamento.
 
-## Fase 2: Projeto (a fazer)
-Casos de uso, modelo de dados, arquitetura, escolha de tecnologias. Primeiras tarefas: definir o que é um treino/sessão, os campos da série, o catálogo de exercícios e o ciclo de vida do registro.
+## Fase 2: Projeto (em andamento)
+- [ ] Definições de domínio: sessão, série (campos e tipos), catálogo de exercícios, ciclo de vida do registro
+- [ ] Casos de uso
+- [ ] Modelo de dados
+- [ ] Arquitetura
+- [ ] Escolha de tecnologias (por último, com o inventário de restrições: banco, custo da API, hospedagem, tempo)
+- Pendências de entrada: revisar US-03 e US-04 (tipo da série); janela de contexto da US-02
 
 ## Fase 3: Construção (a fazer)
 
