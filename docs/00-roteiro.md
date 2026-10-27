@@ -12,7 +12,7 @@
 - Pendências herdadas da Fase 1: ver "Decisões pendentes" no escopo e "Próximo passo de pesquisa" no levantamento.
 
 ## Fase 2: Projeto (em andamento)
-- [ ] Definições de domínio: sessão, série (campos e tipos), catálogo de exercícios, ciclo de vida do registro
+- [x] Definições de domínio: sessão, série (campos e tipos), catálogo de exercícios, ciclo de vida do registro
 - [ ] Casos de uso
 - [ ] Modelo de dados
 - [ ] Arquitetura
