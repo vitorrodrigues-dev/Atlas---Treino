@@ -54,7 +54,7 @@ Pendência de vínculo [novo]: se o exercício do relato não está no catálogo
 
 ### Botão Desfazer e comando `/desfazer`
 - O **comando** `/desfazer` atinge a última mensagem válida com registro nas últimas 24 horas, e cada novo `/desfazer` atinge a seguinte. [herdado]
-- O **botão** [novo, a vetar] desfaz exatamente o registro da confirmação em que aparece, não "o último". Vale pelo mesmo prazo de 24 horas; depois disso, o bot responde que o prazo passou.
+- O **botão** [novo] desfaz exatamente o registro da confirmação em que aparece, não "o último". Vale pelo mesmo prazo de 24 horas; depois disso, o bot responde que o prazo passou.
 - Os dois são idempotentes: tocar duas vezes no botão, ou o Telegram reentregar o comando, não desfaz um segundo registro. [herdado para o comando]
 
 ## 4. Regras que valem em todas as transições [herdado]
@@ -74,7 +74,6 @@ Pendência de vínculo [novo]: se o exercício do relato não está no catálogo
 - Mensagens `NAO_REGISTRADO` e `EXPIRADO` ficam como estão; **reprocessar** é pós-MVP. O usuário reenvia. [herdado]
 
 ## 6. Pontos abertos
-1. Veto ao botão **Desfazer** atado ao registro da confirmação (seção 3).
-2. Prazo e método da exclusão (US-12), incluindo o backup.
-3. Ajustar os 30 minutos depois da primeira semana de teste.
-4. Revisão da retenção antes de abrir além dos testadores.
+1. Prazo e método da exclusão (US-12), incluindo o backup.
+2. Ajustar os 30 minutos depois da primeira semana de teste.
+3. Revisão da retenção antes de abrir além dos testadores.
