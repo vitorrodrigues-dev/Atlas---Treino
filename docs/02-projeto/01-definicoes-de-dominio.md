@@ -53,7 +53,7 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 - **O bot assume a notação convencional:** "3x10" é 3 séries de 10 repetições, e é o que foi realizado. A confirmação mostra "3 séries de 10 repetições", e o `/desfazer` corrige se estiver errado.
 - **Com unidade, é carga:** "3x20kg" é 3 séries com 20 kg, repetições não ditas (vazio, nunca 0).
 - **Quando há outro "NxM" na mesma frase** (ex.: "halter 2x20, 3x10"), o bot confirma antes de tratar o primeiro como "2 halteres de 20".
-- **O bot só pergunta quando não há como resolver:** por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, ainda a definir).
+- **O bot só pergunta quando não há como resolver:** por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, de 30 minutos).
 - O prompt v4 precisa de regra e de casos de regressão para isso.
 
 ### Carga (decidido em 27/10/2026)
@@ -115,7 +115,6 @@ Regras:
 ---
 
 ## Pontos abertos
-1. Ciclo de vida do registro: estados da mensagem (tópico 3).
-2. Janela de contexto da US-02 (por quanto tempo o bot guarda o último exercício citado).
-3. Revisão das US-01, US-03 e US-04 conforme as decisões acima.
-4. Página em `decisoes/` para as decisões de catálogo e carga.
+1. Validar a janela de 30 minutos da US-02 depois da primeira semana de teste.
+2. Prazo e método da exclusão de dados (US-12).
+3. Página em `decisoes/` para as decisões de catálogo e carga (opcional).

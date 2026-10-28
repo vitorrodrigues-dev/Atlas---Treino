@@ -1,5 +1,7 @@
 # Glossário de domínio: linguagem da musculação
 
+> Os itens marcados [decidir] abaixo foram decididos em `01-definicoes-de-dominio.md` (27/10/2026).
+
 Fase 2 (Projeto). Pesquisa de 27/10/2026, tópico 1: sessão, série e vocabulário em volta deles.
 
 **Para que serve:** saber como as pessoas falam, para o extrator entender o relato e para o modelo de dados não usar o mesmo nome para coisas diferentes. Este documento é vocabulário, não decisão. As decisões vão em `01-definicoes-de-dominio.md` e em `decisoes/`.

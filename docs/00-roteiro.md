@@ -17,7 +17,7 @@
 - [ ] Modelo de dados
 - [ ] Arquitetura
 - [ ] Escolha de tecnologias (por último, com o inventário de restrições: banco, custo da API, hospedagem, tempo)
-- Pendências de entrada: revisar US-03 e US-04 (tipo da série); janela de contexto da US-02
+- Próximo passo: casos de uso, a partir das user stories ajustadas em 28/10/2026.
 
 ## Fase 3: Construção (a fazer)
 
