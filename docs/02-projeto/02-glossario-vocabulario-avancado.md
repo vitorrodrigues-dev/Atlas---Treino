@@ -426,7 +426,7 @@ A principal conclusão é que, para um chatbot que registra treino por texto liv
 17. [Treinamento Para Força Muscular e Hipertrofia - Stlab](https://stlab.com.br/forca-e-hipertrofia/)
 18. [UNIVERSIDADE FEDERAL DO ESPÍRITO SANTO CENTRO DE EDUCAÇÃO FÍSICA E DESPORTOS](https://cefd.ufes.br/sites/cefd.ufes.br/files/field/anexo/hugo_policarpo_farina_e_luiz_felipe_pimentel_-_metodos_de_treinamento_de_forca_tradicionais_e_contemporaneos_uma_revisao_descritiva.pdf)
 19. [aplicabilidade dos métodos populares de treinamento ...](https://www.unipar.br/documentos/229/Aplicabilidade_dos_Metodos_Populares_de_Treinamento_Resistido_Um_Estudo_de_Revisao.pdf)
-20. [comparação de diferentes métodos de](https://sip.prg.ufla.br/arquivos/php/bibliotecas/repositorio/download_documento/baixar_por_anosemestre_matricula.php?arquivo=20241_202010558)
+20. [fonte removida: link continha identificador pessoal]”.
 21. [ROUBO Cláusulas Exemplificativas](https://www.lawinsider.com/pt/clause/roubo)
 22. [11 Métodos de Treinamento de Força: Guia Completo](https://treinomestre.com.br/musculacao-os-11-principais-metodos-de-treinamento-de-forca/)
 23. [21 Metodos de treino e quais são os elementos essenciais?](https://www.tecnofit.com.br/blog/metodos-de-treino/)
