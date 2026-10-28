@@ -1,6 +1,7 @@
 # Botões só para confirmar e desfazer
 
 Data: 25/10/2026
+Status: superada em 27/10/2026 por `2026-10-27-grava-na-hora-botao-desfazer.md` (não há botão "Confirmar").
 
 ## Contexto
 Na pesquisa, botões foram a forma preferida de registro (7 de 20), à frente do texto (5 de 20). Mas relatar séries, cargas e repetições por botões exige muitas telas.
