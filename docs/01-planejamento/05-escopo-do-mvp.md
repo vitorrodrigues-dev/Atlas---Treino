@@ -28,9 +28,9 @@ O recrutamento prioriza esse perfil, mesmo que sejam poucas pessoas. O número m
 |---|---|
 | US-01 | Relatar o treino em linguagem natural, por texto |
 | US-02 | Relatar aos poucos, com o bot guardando o contexto entre mensagens |
-| US-03 | Ver o que o bot entendeu, com botões para confirmar |
+| US-03 | Ver o que o bot entendeu (data, sessão, exercício, séries e tipo da série), com botão para desfazer |
 | US-04 | Consultar a última carga de um exercício |
-| US-06 | Desfazer o último registro, com botão |
+| US-06 | Desfazer um registro, por botão ou pelo comando /desfazer |
 | US-07 | Entrar no teste sem criar conta |
 | US-08 | Administrador aprova testadores |
 | US-09 | Respostas acolhedoras, sem cobrança |
@@ -42,7 +42,7 @@ O recrutamento prioriza esse perfil, mesmo que sejam poucas pessoas. O número m
 | US-19 | Consultar a evolução por comando (uso medido no teste) |
 | RNF-01 a RNF-05 | Confiar no histórico, não perder nem duplicar, privacidade e segurança, respeitar o orçamento, responder rápido |
 
-Forma de interação: texto livre para relatar o treino; botões apenas para confirmar, desfazer e resolver dúvidas do bot.
+Forma de interação: texto livre para relatar o treino; botões apenas para desfazer e resolver dúvidas do bot. Não há botão "Confirmar": o relato é gravado na hora (decisão de 27/10/2026).
 
 ## O que fica de fora
 
@@ -58,6 +58,9 @@ Forma de interação: texto livre para relatar o treino; botões apenas para con
 | Bi-set e tri-set | Adiados; drop set cobre a técnica mais citada |
 | Abertura para alunos de academia | Exige revisão de privacidade antes (ver riscos) |
 | Lembretes de registro | Ideia futura, sem teste |
+| Ficha de treino como entidade | O rótulo do treino (A, B, C) cobre o necessário no MVP |
+| Modalidade (corrida, cardio) | Cardio vai como texto na observação da sessão |
+| Importar base externa de exercícios | Licenças; o catálogo vem da ficha de cada testador |
 
 ## Como saberemos se deu certo
 
@@ -65,7 +68,7 @@ Critérios do teste, com números ainda por definir antes de começar:
 
 - Quantos testadores aprovados registraram pelo menos um treino na primeira semana: [definir].
 - Quantos continuaram registrando na segunda semana: [definir].
-- Parte dos relatos confirmada sem correção: [definir]. Confirmar sem corrigir pode refletir pressa; por isso, uma amostra de relatos de tamanho [definir] é conferida manualmente contra o que o testador disse.
+- Parte dos relatos sem /desfazer: [definir]. Não desfazer pode refletir pressa; por isso, uma amostra de relatos de tamanho [definir] é conferida manualmente contra o que o testador disse.
 - Uso do comando de evolução (US-19): [medir], para decidir se a tela de evolução vale o esforço.
 - Percepção dos testadores sobre o tom do bot (US-09): [coletar].
 - Custo da API no período de teste dentro do orçamento (RNF-04).
@@ -89,5 +92,6 @@ Critérios do teste, com números ainda por definir antes de começar:
 ## Decisões pendentes
 
 - Valores dos critérios de sucesso acima.
-- Janela de contexto da US-02 (por quanto tempo o bot guarda o último exercício citado).
-- Revisar as US-03 e US-04 para mostrar o tipo da série (decisão da US-18).
+- Validar a janela de 30 minutos (contexto da US-02 e pergunta pendente) depois da primeira semana de teste.
+- Prazo e método da exclusão de dados (US-12), incluindo o backup.
+- Revisão da retenção e do aviso de privacidade antes de abrir além dos testadores.

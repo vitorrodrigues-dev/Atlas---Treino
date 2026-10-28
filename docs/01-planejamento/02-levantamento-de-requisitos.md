@@ -104,9 +104,7 @@ Padrões observados nos relatos:
 
 ## Decisões em aberto geradas pela pesquisa
 
-Decididas no `05-escopo-do-mvp.md`: botões apenas para confirmar e desfazer; US-19 (evolução por comando) no MVP.
-
-Pendente: a US-18 (aquecimento) fica no MVP ou vai para o Pós-MVP?
+Decididas no `05-escopo-do-mvp.md` e em `decisoes/`: botões apenas para desfazer e resolver dúvidas, sem botão "Confirmar" (27/10/2026); US-19 (evolução por comando) no MVP; US-18 (aquecimento) no MVP (26/10/2026).
 
 ## Tratamento dos dados do formulário
 

@@ -21,6 +21,7 @@ Como praticante com ficha, quero relatar meu treino por texto, do jeito que fala
 
 Fase: MVP.
 - Dado um relato completo ("3x20kg no supino, falhei na última"), quando envio a mensagem, então as séries ficam salvas com exercício, carga e repetições.
+- Dado um atalho de séries ("3x10"), quando envio, então o bot registra 3 séries de 10 repetições e mostra essa leitura na confirmação; com unidade ("3x20kg"), lê como carga e deixa as repetições vazias.
 - Dado que um dado não foi dito, quando o relato é salvo, então o campo fica vazio, nunca preenchido por suposição.
 - Dado que a extração falhou, quando recebo a resposta, então o texto original continua salvo e sou avisado para reenviar.
 
@@ -28,19 +29,19 @@ Fase: MVP.
 
 Como praticante, quero mandar o treino em mensagens curtas, uma série por vez, para não escrever tudo de uma só vez no meio do treino.
 
-Fase: MVP. Decidido em 25/10/2026: o bot guarda o contexto entre mensagens; falta definir por quanto tempo.
-- Dado que citei o exercício há poucos minutos [definir a janela], quando envio "2ª série, 55kg", então a série vai para esse exercício e a confirmação mostra qual exercício foi assumido.
+Fase: MVP. Decidido em 25/10/2026: o bot guarda o contexto entre mensagens. Janela de 30 minutos, decidida em 27/10/2026 e ajustável depois da primeira semana de teste.
+- Dado que citei o exercício há até 30 minutos, quando envio "2ª série, 55kg", então a série vai para esse exercício e a confirmação mostra qual exercício foi assumido.
 - Dado que não está claro a qual exercício a série pertence, quando envio a mensagem, então o bot pergunta em vez de assumir.
+- Dado que o bot fez uma pergunta, quando respondo por botão em até 30 minutos, então a série é registrada com a minha resposta; se a pergunta expira, nada é gravado como série e o texto original continua salvo.
 
 ### US-03 Ver o que o bot entendeu
 
 Como praticante, quero que o bot confirme o que registrou, para perceber na hora se ele entendeu errado.
 
 Fase: MVP.
-- Dado um relato registrado, quando recebo a confirmação, então ela mostra a data, o exercício e as séries, com "~" nos valores aproximados e "—" no que não foi dito (nunca 0).
+- Dado um relato registrado, quando recebo a confirmação, então ela mostra a data, a sessão, o exercício e as séries, com "~" nos valores aproximados e "—" no que não foi dito (nunca 0).
 - Dado um exercício fora do catálogo, quando recebo a confirmação, então o bot avisa que não o reconheceu e a série continua salva.
-
-A revisar (26/10/2026): a confirmação passa a mostrar o tipo da série (decisão da US-18).
+- Dado um relato registrado, quando recebo a confirmação, então ela traz o botão Desfazer e mostra o tipo das séries que não são de trabalho (decisões da US-18 e de 27/10/2026).
 
 ### US-17 Registrar um drop set como uma única série
 
@@ -74,8 +75,7 @@ Fase: MVP.
 - Dado um nome que serve para mais de um exercício, quando envio o comando, então o bot lista as opções em vez de escolher uma.
 - Dado que existem registros desfeitos, quando consulto, então eles não aparecem.
 - Dado que existem outros testadores, quando consulto, então vejo apenas os meus dados.
-
-A revisar (26/10/2026): a confirmação passa a mostrar o tipo da série (decisão da US-18).
+- Dado que o último treino tem séries de aquecimento ou preparatórias, quando consulto, então elas aparecem marcadas com o tipo.
 
 ### US-05 Perguntar em texto livre
 
@@ -102,6 +102,8 @@ Fase: MVP.
 - Dado que enviei um relato errado, quando envio /desfazer, então o registro é marcado como desfeito (não apagado) e a resposta lista o que saiu.
 - Dado que envio /desfazer de novo, quando há registros anteriores nas últimas 24 horas, então o próximo registro é desfeito.
 - Dado que o Telegram reenviou o mesmo comando, quando o bot o recebe, então nenhum segundo registro é desfeito.
+- Dado uma confirmação com o botão Desfazer, quando toco nele em até 24 horas, então o registro daquela confirmação é desfeito e a resposta lista o que saiu; depois de 24 horas, o bot avisa que o prazo passou.
+- Dado que toquei duas vezes no botão, quando o bot recebe o segundo toque, então nenhum outro registro é desfeito.
 
 ## Épico 4: Acesso ao teste
 
@@ -141,7 +143,7 @@ Como administrador, quero que o bot tenha limites claros diante de xingamentos, 
 
 Fase: MVP. As proteções do modelo ajudam, mas o comportamento esperado do bot precisa ser definido e testado por nós.
 - Dado um xingamento, quando o bot responde, então a resposta é curta e neutra, sem rebater, e nada é registrado como treino.
-- Dado que relato dor ou lesão, quando o bot responde, então ele anota sem diagnosticar e sugere procurar um profissional.
+- Dado que relato dor ou lesão, quando o bot responde, então ele anota sem diagnosticar e sugere procurar um profissional de saúde, sem recomendar o que fazer com a carga.
 - Dado um pedido de dieta, medicação ou diagnóstico, quando o bot responde, então ele recusa e indica um profissional.
 - Dado um assunto sensível ou uma emergência, quando o bot responde, então ele não aconselha e indica buscar ajuda adequada [definir o texto].
 - Dada uma lista de mensagens de teste desses casos, quando rodo a lista, então o comportamento esperado se repete (teste de regressão).
@@ -153,7 +155,7 @@ Fase: MVP. As proteções do modelo ajudam, mas o comportamento esperado do bot 
 Como testador, quero ser avisado do que é gravado e para onde vai, para decidir se quero usar.
 
 Fase: MVP. O aviso deve informar que o texto passa pela API da Anthropic.
-- Dado que me cadastro, quando recebo a boas-vindas, então ela informa que grava texto e treinos, que é um banco de estudo, que o texto passa pela API da Anthropic, que posso pedir para apagar e que o acesso depende de aprovação.
+- Dado que me cadastro, quando recebo a boas-vindas, então ela informa que grava texto e treinos, que é um banco de estudo, que o texto passa pela API da Anthropic, que os dados podem ser analisados para entender padrões de uso, que posso pedir para apagar e que o acesso depende de aprovação.
 - Dado o aviso final, quando o reviso antes do teste, então ele cobre finalidade, dados de saúde que podem aparecer nas observações e direitos do titular, conforme a LGPD [decidir como validar].
 
 ### US-12 Pedir a exclusão dos meus dados
