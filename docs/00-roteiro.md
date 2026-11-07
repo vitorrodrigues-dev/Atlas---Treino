@@ -13,11 +13,12 @@
 
 ## Fase 2: Projeto (em andamento)
 - [x] Definições de domínio: sessão, série (campos e tipos), catálogo de exercícios, ciclo de vida do registro
-- [ ] Casos de uso
+- [x] Casos de uso (aceitos em 01/11/2026): [documento](02-projeto/05-casos-de-uso.md)
 - [ ] Modelo de dados
 - [ ] Arquitetura
 - [ ] Escolha de tecnologias (por último, com o inventário de restrições: banco, custo da API, hospedagem, tempo)
-- Próximo passo: casos de uso, a partir das user stories ajustadas em 28/10/2026.
+- Pendências de entrada: as decisões 2 a 5 de 28/10 ainda não têm página em `decisoes/` (a 2 e a 4 mudaram de texto em 01/11/2026, ver o fim dos casos de uso).
+- Próximo passo: modelo de dados (começando pelo mínimo da primeira fatia), a partir dos fluxos alternativos dos casos de uso.
 
 ## Fase 3: Construção (a fazer)
 
