@@ -79,7 +79,8 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 **Fluxos alternativos**
 - 1a. O testador toca duas vezes, ou o toque é entregue duas vezes: a segunda vez não muda nada (idempotente).
 - 1b. A série foi desfeita antes do toque: o sistema avisa que o registro não vale mais.
-- 1c. Nenhuma candidata é o exercício certo: a série continua pendente. **[definir]** como o testador resolve isso no MVP (o administrador acrescenta o exercício à ficha pelo UC-10?).
+- 1c. Nenhuma candidata é o exercício certo: a série continua pendente e o testador não precisa fazer nada; o administrador acrescenta o exercício à ficha pelo UC-10. Não há correção de vínculo no MVP: vínculo errado se corrige com **Desfazer** e reenvio. *(Decidido em 07/11/2026.)*
+- 1d. O botão só vincula enquanto a série está pendente; depois disso o sistema responde a qual exercício ela já está ligada.
 - 2a. **Apelido (decidido em 01/11/2026):** se o texto do relato não casou com nenhum exercício (caso 6a), o vínculo cria um apelido do testador com esse texto, em minúsculas, apontando para o exercício escolhido. Se o texto era ambíguo (caso 6b, como "remada"), **nenhum apelido é criado**, porque nome ambíguo não vira apelido e o bot volta a perguntar da próxima vez.
 
 **Pós-condição:** a série está ligada a um exercício oficial do catálogo do testador, e ele sabe qual.
@@ -126,7 +127,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 2. O sistema guarda a consulta (sem sessão; `/desfazer` não a atinge).
 3. O sistema identifica o exercício pelo apelido, pelo nome oficial ou por todas as palavras do texto.
 4. O sistema localiza a sessão mais recente **do próprio testador** com séries desse exercício, ignorando registros desfeitos.
-5. O sistema responde com a data e todas as séries dessa sessão, na ordem em que foram registradas, com o tipo marcado nas que não são de trabalho e `~`/`—` onde couber.
+5. O sistema responde com a data e todas as séries dessa sessão, na ordem em que foram registradas, com o tipo marcado nas que não são de trabalho e `~`/`—` onde couber. A carga aparece como o usuário disse (valor, forma declarada e `~`), não a normalizada.
 
 **Fluxos alternativos**
 - 3a. O nome serve para mais de um exercício: o sistema lista as opções em vez de escolher.
@@ -152,8 +153,8 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 
 **Fluxos alternativos**
 - 2a. Nome ambíguo ou não reconhecido: como UC-04 (3a, 3b).
-- 3a. Há menos de **3** registros do exercício: o sistema avisa que ainda não há dados suficientes.
-- 4a. **[definir]** O que significa "carga de trabalho por data" (maior carga, última série, média), como tratar séries sem carga normalizada e qual unidade exibir. Isso é decisão do modelo de dados.
+- 3a. Há menos de **3** sessões com carga de trabalho do exercício: o sistema avisa que ainda não há dados suficientes.
+- 4a. Para cada sessão, a maior carga normalizada entre as séries de trabalho (etapa 1), com as repetições da série em que ocorreu. Séries sem carga normalizada ficam de fora. Se houver unidades incomparáveis (kg e placa), mostra só a mais recente e avisa.
 
 **Pós-condição:** o testador viu a evolução; o uso do comando é contado para a hipótese H3.
 
@@ -170,7 +171,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 **Fluxo principal**
 1. A pessoa envia `/start`.
 2. O sistema cadastra a pessoa como PENDENTE, com nome, identificador do canal e data. Nunca grava o texto da mensagem. **[PREMISSA: decisão 5 de 28/10, sem página em `decisoes/`]**
-3. O sistema envia a boas-vindas com o aviso de dados: grava texto e treinos; é um banco de estudo; o texto passa pela API da Anthropic; pode pedir para apagar; o acesso depende de aprovação (US-11).
+3. O sistema envia a boas-vindas com o aviso de dados: grava texto e treinos; é um banco de estudo; o texto passa pela API da Anthropic; pode pedir para apagar; o acesso depende de aprovação (US-11). O sistema registra a data do envio do aviso.
 4. O sistema avisa o administrador (UC-07).
 
 **Fluxos alternativos**
@@ -225,23 +226,23 @@ Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um 
 ## UC-09 Excluir dados a pedido
 
 - **Ator primário:** Administrador. **Interessado:** Testador (quem pede).
-- **Pré-condição:** o testador pediu a exclusão. **[definir]** o canal do pedido.
+- **Pré-condição:** o testador pediu a exclusão. O pedido chega por mensagem ao administrador, pelo canal de fora do bot.
 - **Gatilho:** o administrador recebe o pedido.
 
 **Fluxo principal**
 1. O testador pede a exclusão dos dados.
 2. O administrador confirma que o pedido é do testador.
-3. O administrador exclui mensagens, sessões e séries desse testador, inclusive as desfeitas.
-4. O administrador trata a cópia do backup. **[definir como]**
+3. O administrador apaga o **histórico** do testador (mensagens, sessões e séries, inclusive as desfeitas). Cadastro, ficha e apelidos ficam. Se o testador pediu para **sair**, apaga também cadastro, ficha e apelidos.
+4. O administrador descarta backups com mais de 30 dias e, se restaurar um backup, refaz as exclusões do registro privado.
 5. O administrador confirma ao testador que foi feito.
 
 **Fluxos alternativos**
 - 2a. Não é possível confirmar quem pediu: o pedido não é atendido.
-- 3a. **[definir]** O cadastro do testador (identificador, nome) também sai? Isso o impede de voltar.
+- 3a. Exclusão total: o testador só volta com novo `/start` e nova aprovação.
 
-**Pós-condição:** nenhum dado do testador permanece no banco, dentro do prazo. **[definir prazo]**
+**Pós-condição:** dentro do prazo de 7 dias corridos, nenhum histórico do testador permanece no banco (mensagens, sessões e séries); na exclusão total, também não permanecem cadastro, ficha e apelidos.
 
-*(Adiado em 01/11/2026: cadastro, prazo e backup serão decididos mais adiante.)*
+*(Fechado em 07/11/2026: D2 do `06-modelo-de-dados.md`.)*
 
 ---
 
@@ -296,10 +297,7 @@ Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um 
 
 ## Ainda em aberto
 
-- O que fazer quando nenhuma candidata serve (UC-02, 1c).
-- "Carga de trabalho por data": agregação e unidade (vai para o modelo de dados).
-- Excluir o cadastro, prazo e backup (UC-09).
-- Canal do pedido de exclusão (UC-09).
+Nada em aberto no modelo de dados (ver `06-modelo-de-dados.md`).
 
 ## Consequências nos outros documentos
 

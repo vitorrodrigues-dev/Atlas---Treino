@@ -37,7 +37,7 @@ O resto deste documento trata do **relato**.
 | **REGISTRADO** | Séries salvas; sessão criada ou atualizada. Pode haver séries pendentes de vínculo. | A confirmação com data, sessão, exercício, séries, `~` e `—`, o botão **Desfazer** e, se houver pendência, os botões de vínculo |
 | **SEM_SERIES** [herdado] | O relato não tinha séries. Com observação, cria ou atualiza a sessão; sem observação, não cria sessão. | "Não encontrei séries" (ou "anotei") |
 | **NAO_REGISTRADO** [herdado] | Falha depois de salvar o texto (extração, API, validação, observação cheia). O texto bruto continua salvo. | "Salvei o texto, mas não consegui registrar. Reenvie." |
-| **DESFEITO** [herdado] | O usuário desfez o registro. É marcado (com data), nunca apagado. | A lista do que saiu |
+| **DESFEITO** [herdado] | O usuário desfez o registro. É marcado (com data), nunca apagado. No modelo de dados é a data `desfeita_em`, não um valor de `resultado`; o comportamento é o mesmo. | A lista do que saiu |
 
 **Pendência de vínculo** [novo]: se o exercício do relato não está no catálogo, ou o nome é ambíguo, a **série** é gravada com o exercício oficial vazio ("pendente de vínculo") e é ligada quando o usuário tocar no botão (UC-02). É um atributo da série, não um estado do relato, e não tem prazo de expiração. Nunca se cria exercício oficial automaticamente.
 
@@ -66,14 +66,14 @@ O resto deste documento trata do **relato**.
 
 ## 5. Fim da vida do dado
 - **Desfeito:** fica no banco, marcado, para preservar o histórico e a métrica de correções. Sai do banco só junto com a exclusão do usuário.
-- **Exclusão a pedido (US-12, UC-09):** o administrador apaga mensagens, sessões e séries do usuário; a cópia do backup também é tratada. Prazo e método ainda são [definir].
+- **Exclusão a pedido (US-12, UC-09):** o administrador apaga mensagens, sessões e séries do usuário; a cópia do backup também é tratada. Prazo de 7 dias corridos; método em D2 do `06-modelo-de-dados.md`.
 - **Uso para análise:** os dados podem ser analisados para entender padrões de uso do teste, mesmo de quem parou de usar, desde que o aviso da boas-vindas diga isso. A exclusão a pedido continua valendo para todos.
 - **Revisão antes de abrir além dos testadores:** decidir o que fica (séries estruturadas) e o que sai (texto bruto, que é o mais sensível), ou anonimizar. Isto não é parecer jurídico.
 - Mensagens `NAO_REGISTRADO` ficam como estão; **reprocessar** é pós-MVP. O usuário reenvia. [herdado]
 
 ## 6. Pontos abertos
-1. Prazo e método da exclusão (US-12), incluindo o backup.
+1. Prazo e método da exclusão (US-12), incluindo o backup. **Fechado em 07/11/2026:** D2 do `06-modelo-de-dados.md`.
 2. Ajustar os 30 minutos da janela de contexto depois da primeira semana de teste.
 3. Revisão da retenção antes de abrir além dos testadores.
-4. Conflito apontado na revisão de 28/10: o texto livre da série segue a série ou o texto bruto na revisão de retenção?
-5. O que fazer quando nenhuma candidata do botão de vínculo é o exercício certo (UC-02, 1c).
+4. Conflito apontado na revisão de 28/10: o texto livre da série segue a série ou o texto bruto na revisão de retenção? **Fechado em 07/11/2026:** segue o texto bruto (D2 do `06-modelo-de-dados.md`).
+5. O que fazer quando nenhuma candidata do botão de vínculo é o exercício certo (UC-02, 1c). **Fechado em 07/11/2026:** D8 do `06-modelo-de-dados.md`.

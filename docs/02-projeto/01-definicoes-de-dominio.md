@@ -26,21 +26,21 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 ## Exercício e catálogo
 **Definição:** o exercício oficial é uma variação concreta (ex.: "Supino inclinado halter", "Supino inclinado Smith"). Cada variação é um exercício separado, porque a carga e a forma de registrar não são comparáveis entre equipamentos.
 
-- **Atributos** (metadados, não identidade): movimento-base, equipamento, pegada, ângulo, unilateral ou bilateral. Servem para agrupar e para montar a pergunta quando o nome vem incompleto.
-- **Grupo de variação:** vínculo opcional entre exercícios da mesma família, para comparar sem misturar histórico.
+- **Atributos** (metadados, não identidade): movimento-base, equipamento, pegada, ângulo, unilateral ou bilateral. Servem para agrupar e para montar a pergunta quando o nome vem incompleto. **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5).
+- **Grupo de variação:** vínculo opcional entre exercícios da mesma família, para comparar sem misturar histórico. **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5).
 - **Tipo de registro** (por exercício): `PESO_E_REPS`, `CORPORAL` (só repetições), `CORPORAL_COM_LASTRO`, `ASSISTIDO`, `DURACAO`. Evita ler "assistida 20" como carga. Barra fixa sem peso é carga 0 quando dito; vazio continua sendo "não dito".
 - **Forma da carga padrão** (por exercício): `POR_LADO` ou `TOTAL`. Ver a regra de carga abaixo.
-- **Faixa-alvo de repetições:** opcional (as duas pontas ou nenhuma).
+- **Faixa-alvo de repetições:** opcional (as duas pontas ou nenhuma). **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5).
 - **No MVP, o catálogo de cada testador vem da ficha dele**, com cerca de 50 exercícios. Não se importa base externa (wger e similares ficam fora do MVP por causa das licenças).
 
 ### Apelidos
 - Pertencem ao **usuário**, são guardados em minúsculas, e cada um aponta para **um único exercício**.
-- Nomes ambíguos não viram apelido global ("remada", "puxada", "pulley", "scott", "cavalinho", "crucifixo"). O bot **lista as candidatas da ficha do próprio usuário** e pergunta, em vez de assumir.
+- Nomes ambíguos não viram apelido global ("remada", "puxada", "pulley", "scott", "cavalinho", "crucifixo"). A série é gravada pendente de vínculo e o bot oferece botões com as **candidatas da ficha do próprio usuário**, sem esperar resposta; ele não assume.
 - Só assume quando houver um único candidato na ficha do usuário, e a confirmação mostra o que ele entendeu.
 
 ### Exercício fora do catálogo
 - Fica registrado como **não catalogado**, com o texto original e as séries já interpretadas, **pendente de vínculo**, sem prazo de expiração no MVP.
-- Quando o usuário confirmar, a série é religada ao exercício (novo ou existente). Nunca se cria exercício oficial automaticamente.
+- Quando o usuário tocar no botão de uma candidata, a série é ligada a esse exercício **do catálogo dele**. Se nenhuma candidata serve, a série continua pendente e o administrador acrescenta o exercício pela ficha (UC-10). Nunca se cria exercício oficial automaticamente.
 
 ---
 
@@ -53,19 +53,21 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 - **O bot assume a notação convencional:** "3x10" é 3 séries de 10 repetições, e é o que foi realizado. A confirmação mostra "3 séries de 10 repetições", e o `/desfazer` corrige se estiver errado.
 - **Com unidade, é carga:** "3x20kg" é 3 séries com 20 kg, repetições não ditas (vazio, nunca 0).
 - **Quando há outro "NxM" na mesma frase** (ex.: "halter 2x20, 3x10"), o bot confirma antes de tratar o primeiro como "2 halteres de 20".
-- **O bot só pergunta quando não há como resolver:** por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, de 30 minutos).
+- **Quando não há como resolver o exercício:** a série é gravada pendente de vínculo e o bot oferece botões com as candidatas, sem esperar resposta. Por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, de 30 minutos).
 - O prompt v4 precisa de regra e de casos de regressão para isso.
 
 ### Carga (decidido em 27/10/2026)
 A forma da carga **padrão fica no exercício**, e a série guarda o que foi dito:
 
-| Campo da série | Observação |
+| Campo da etapa | Observação |
 |---|---|
 | Texto original da carga | Prova do que o usuário escreveu |
 | Número informado | Vazio = não dito (nunca 0); aproximado? |
 | Forma declarada | por lado, total ou não declarada |
 | Carga normalizada | Na forma padrão do exercício; vazia se não der para calcular |
 | Origem | explícita, derivada (ex.: 40 total → 20 por lado) ou padrão do exercício |
+
+Esses campos moram na **etapa**, não na série (ver `06-modelo-de-dados.md`).
 
 Regras:
 - **Halter, kettlebell e implementos únicos:** o número é o peso de **um** implemento. "10 cada" é 10 por halter. Isso vale também para afundo e búlgaro com dois halteres. Quando o exercício é unilateral, o registro continua unilateral.
@@ -77,19 +79,21 @@ Regras:
 - **kg e lb:** converte para kg guardando o original. Aceita vírgula decimal ("2,5").
 - **Local ou equipamento (academia) na série:** fora do MVP. Se o usuário citar a academia, vai no texto livre.
 - **Peso corporal e assistência:** a carga é só o acréscimo (lastro). Assistência é tipo de registro próprio (`ASSISTIDO`), nunca carga negativa.
+- **Unidade não dita:** lê-se kg; a confirmação mostra "kg" e o `/desfazer` corrige. É uma exceção deliberada ao RNF-01 (ver D12 no modelo de dados). PLACA e PINO nunca são assumidos.
 
 ### Campos da série
 | Campo | Obrigatório? | Observação |
 |---|---|---|
-| Exercício relatado | Sim | Como o usuário disse |
+| Exercício relatado | Não | Como o usuário disse; vazio quando ele não citou exercício (UC-01 6c) |
 | Exercício oficial | Não | Vazio até casar com o catálogo; nunca por aproximação |
-| Número da série | Sim | Por exercício, dentro da sessão |
+| Motivo da pendência | Não | Quando a série nasce sem exercício oficial: não catalogado, ambíguo ou sem exercício citado |
+| Número da série | Sim | Informativo, não único; a ordem de leitura vem da mensagem e do número |
 | Tipo | Sim | `TRABALHO` (padrão), `AQUECIMENTO`, `PREPARATORIA` |
-| Carga | Não | Os cinco campos da tabela acima |
-| Repetições | Não | Vazio = não dito (nunca 0); aproximadas? |
+| Carga | Não | Mora na **etapa**: toda série tem pelo menos uma etapa; só o drop set tem várias (ver 06-modelo-de-dados.md) |
+| Repetições | Não | Na etapa, como faixa (mínimo e máximo; iguais quando o usuário disse um número só); vazio = não dito (nunca 0); aproximadas? |
 | Falha | Não | Sim, não ou vazio; só marcada quando dita |
 | Texto livre | Não | Ver abaixo |
-| Etapas (drop set) | Não | Série com várias etapas, cada uma com carga e repetições |
+| Etapas | Sim | Uma para a série comum; várias no drop set, cada uma com carga e repetições |
 
 ### Tipo da série
 - `TRABALHO`: a série da carga-alvo do dia. É o padrão quando o usuário não diz outra coisa.
@@ -116,5 +120,5 @@ Regras:
 
 ## Pontos abertos
 1. Validar a janela de 30 minutos da US-02 depois da primeira semana de teste.
-2. Prazo e método da exclusão de dados (US-12).
+2. Prazo e método da exclusão de dados (US-12). **Fechado em 07/11/2026:** D2 do `06-modelo-de-dados.md`.
 3. Página em `decisoes/` para as decisões de catálogo e carga (opcional).

@@ -31,8 +31,8 @@ Como praticante, quero mandar o treino em mensagens curtas, uma série por vez, 
 
 Fase: MVP. Decidido em 25/10/2026: o bot guarda o contexto entre mensagens. Janela de 30 minutos, decidida em 27/10/2026 e ajustável depois da primeira semana de teste.
 - Dado que citei o exercício há até 30 minutos, quando envio "2ª série, 55kg", então a série vai para esse exercício e a confirmação mostra qual exercício foi assumido.
-- Dado que não está claro a qual exercício a série pertence, quando envio a mensagem, então o bot pergunta em vez de assumir.
-- Dado que o bot fez uma pergunta, quando respondo por botão em até 30 minutos, então a série é registrada com a minha resposta; se a pergunta expira, nada é gravado como série e o texto original continua salvo.
+- Dado que não está claro a qual exercício a série pertence, quando envio a mensagem, então a série é gravada pendente de vínculo e a confirmação traz botões com as candidatas; o bot não assume.
+- Dado uma série gravada pendente de vínculo, quando toco no botão de uma das candidatas, então a série é ligada a esse exercício; o botão não tem prazo e vale enquanto a série estiver pendente e não tiver sido desfeita.
 
 ### US-03 Ver o que o bot entendeu
 
@@ -88,8 +88,8 @@ Fase: Pós-MVP. É um épico e deve ser fatiado em carga por período, treino de
 Como praticante, quero perguntar como evoluí em um exercício ao longo das semanas, para ver meu progresso sem esperar o site.
 
 Fase: MVP. Hipótese: a evolução é o valor mais citado na pesquisa (10 de 20), mas só 2 sentem falta de um lugar para ver. O uso desse comando será medido no teste. A tela de celular (US-14) continua Pós-MVP.
-- Dado um exercício com registros em datas diferentes, quando envio o comando de evolução com o nome ou o apelido, então recebo a carga de trabalho por data, da mais antiga à mais recente [definir período].
-- Dado menos de [definir mínimo] registros do exercício, quando consulto, então o bot informa que ainda não há dados suficientes.
+- Dado um exercício com registros em datas diferentes, quando envio o comando de evolução com o nome ou o apelido, então recebo a maior carga de trabalho de cada sessão, com a data, da mais antiga à mais recente sem filtro de período.
+- Dado menos de 3 sessões com carga de trabalho do exercício, quando consulto, então o bot informa que ainda não há dados suficientes.
 - Dado registros desfeitos, quando consulto, então eles não aparecem.
 
 ## Épico 3: Corrigir erros
@@ -145,7 +145,7 @@ Fase: MVP. As proteções do modelo ajudam, mas o comportamento esperado do bot 
 - Dado um xingamento, quando o bot responde, então a resposta é curta e neutra, sem rebater, e nada é registrado como treino.
 - Dado que relato dor ou lesão, quando o bot responde, então ele anota sem diagnosticar e sugere procurar um profissional de saúde, sem recomendar o que fazer com a carga.
 - Dado um pedido de dieta, medicação ou diagnóstico, quando o bot responde, então ele recusa e indica um profissional.
-- Dado um assunto sensível ou uma emergência, quando o bot responde, então ele não aconselha e indica buscar ajuda adequada [definir o texto].
+- Dado um assunto sensível ou uma emergência, quando o bot responde, então ele não aconselha e indica buscar ajuda adequada: texto fixo aprovado em 01/11/2026 (ver RT-01 nos casos de uso).
 - Dada uma lista de mensagens de teste desses casos, quando rodo a lista, então o comportamento esperado se repete (teste de regressão).
 
 ## Épico 6: Privacidade e conformidade
@@ -163,9 +163,10 @@ Fase: MVP. O aviso deve informar que o texto passa pela API da Anthropic.
 Como testador, quero poder pedir a exclusão dos meus dados, para ter controle sobre o que ficou guardado.
 
 Fase: MVP. No início o administrador pode apagar direto no banco.
-- Dado um pedido de exclusão, quando o administrador o atende em até [definir prazo], então mensagens, sessões e séries desse testador deixam de existir no banco.
+- Dado um pedido de exclusão, quando o administrador o atende em até 7 dias corridos, então mensagens, sessões e séries desse testador deixam de existir no banco.
 - Dado que a exclusão foi feita, quando o testador pergunta, então ele recebe a confirmação.
-- Dado o backup semanal, quando uma exclusão é feita, então a cópia do backup que contém esses dados também é tratada [definir como].
+- Dado o backup semanal, quando uma exclusão é feita, então a cópia do backup que contém esses dados também é tratada: backups são guardados por no máximo 30 dias e, se um backup for restaurado, as exclusões já feitas são refeitas.
+- Dado um pedido de exclusão, quando o testador não pede para sair, então só o histórico é apagado e ele continua ativo, com a ficha e os apelidos.
 
 ## Requisitos não funcionais
 
@@ -173,7 +174,7 @@ Fase: MVP. No início o administrador pode apagar direto no banco.
 
 Como praticante, quero que o bot nunca invente o que não falei, para confiar no que está registrado.
 
-Fase: MVP. O modelo não deve deduzir campos não ditos; isso vira regra do prompt do extrator.
+Fase: MVP. O modelo não deve deduzir campos não ditos; isso vira regra do prompt do extrator. Exceção registrada: a unidade de carga não dita é lida como kg e mostrada na confirmação. O dado guardado continua com a unidade vazia.
 - Dado um campo não dito, quando é gravado, então fica nulo no banco, nunca 0.
 - Dado que o modelo deduziu um campo não dito (por exemplo, "sem falha"), quando o caso aparece nos testes, então ele entra na regressão do prompt.
 

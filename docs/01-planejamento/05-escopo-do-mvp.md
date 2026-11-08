@@ -42,7 +42,7 @@ O recrutamento prioriza esse perfil, mesmo que sejam poucas pessoas. O número m
 | US-19 | Consultar a evolução por comando (uso medido no teste) |
 | RNF-01 a RNF-05 | Confiar no histórico, não perder nem duplicar, privacidade e segurança, respeitar o orçamento, responder rápido |
 
-Forma de interação: texto livre para relatar o treino; botões apenas para desfazer e resolver dúvidas do bot. Não há botão "Confirmar": o relato é gravado na hora (decisão de 27/10/2026).
+Forma de interação: texto livre para relatar o treino; botões apenas para desfazer e vincular exercício. Não há botão "Confirmar": o relato é gravado na hora (decisão de 27/10/2026).
 
 ## O que fica de fora
 
@@ -92,6 +92,6 @@ Critérios do teste, com números ainda por definir antes de começar:
 ## Decisões pendentes
 
 - Valores dos critérios de sucesso acima.
-- Validar a janela de 30 minutos (contexto da US-02 e pergunta pendente) depois da primeira semana de teste.
-- Prazo e método da exclusão de dados (US-12), incluindo o backup.
+- Validar a janela de 30 minutos (contexto da US-02) depois da primeira semana de teste.
+- Prazo e método da exclusão de dados (US-12), incluindo o backup. Fechado: 7 dias corridos (D2 do modelo de dados).
 - Revisão da retenção e do aviso de privacidade antes de abrir além dos testadores.
