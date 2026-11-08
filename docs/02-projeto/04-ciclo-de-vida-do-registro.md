@@ -15,7 +15,7 @@ Stories relacionadas: US-01, US-02, US-03, US-06, US-11, US-12, RNF-01, RNF-02. 
 2. **Série ambígua ou desconhecida também é gravada na hora, sem exercício** (decisão 2 de 28/10, aceita em 01/11). O bot mostra botões com as candidatas e o toque só **vincula** a série a um exercício. Não existe pergunta pendente que expira: o relato nunca fica retido esperando resposta. O botão de vínculo vale enquanto a série existir e não estiver desfeita, sem prazo. Texto digitado depois é um novo relato normal. [novo]
 3. **Janela de contexto:** 30 minutos, usada **só** na US-02 para decidir a qual exercício atribuir uma série que não cita exercício ("2ª série, 55kg"). Se o último exercício citado está fora da janela, a série é gravada pendente de vínculo, como em 2. O valor é ajustável depois da primeira semana de teste.
 4. **Retenção:** o dado fica enquanto o usuário existir no sistema, e só sai por exclusão a pedido (US-12). Pode ser usado para análise de padrões do teste, e isso precisa constar no aviso da boas-vindas (US-11). Antes de abrir além dos testadores aprovados, a retenção é revista: separar o que fica (séries estruturadas) do que sai (texto bruto) ou anonimizar.
-5. **Mantido do repositório antigo:** `/desfazer` com exclusão lógica, pilha de 24 horas, observação que não desfaz e reprocessamento fora do MVP.
+5. **Mantido do repositório antigo:** `/desfazer` com exclusão lógica, pilha de 24 horas, observação que não desfaz e reprocessamento de NAO_REGISTRADO fora do MVP.
 6. **Botão Desfazer aprovado** (28/10): ele **soma** ao `/desfazer`, não o substitui.
 
 ---
@@ -25,7 +25,7 @@ Toda mensagem de um usuário aprovado é guardada crua. Ela pode ser:
 - **Relato:** texto de treino, que passa pelo extrator.
 - **Consulta** (ex.: `/carga supino`): guardada crua, sem sessão, não é atingida pelo `/desfazer`. [herdado]
 - **Comando** (`/desfazer`, `/start`): tratado pelo bot, sem extrator. [herdado]
-- Mensagens de quem não está ATIVO, mensagens em grupo e edições de mensagem não entram no ciclo: são ignoradas ou recebem um aviso, e nada é gravado. [herdado]
+- Mensagens de quem não está ATIVO, mensagens em grupo, edições de mensagem e mensagens com foto, áudio ou figurinha [novo] não entram no ciclo: são ignoradas ou recebem um aviso, e nada é gravado. [herdado]
 
 O resto deste documento trata do **relato**.
 
@@ -33,7 +33,7 @@ O resto deste documento trata do **relato**.
 
 | Estado | Significado | O usuário vê |
 |---|---|---|
-| **RECEBIDO** | Texto bruto salvo; extração ainda não terminou. É momentâneo. | Nada |
+| **RECEBIDO** | Texto bruto salvo; extração ainda não terminou. É momentâneo. Se o serviço parar antes de terminar, na subida ele reprocessa **uma vez** os relatos que ficaram RECEBIDO; se falhar de novo, o relato vira NAO_REGISTRADO e o usuário recebe o aviso de reenviar (A12 de `07-arquitetura.md`). [novo] | Nada |
 | **REGISTRADO** | Séries salvas; sessão criada ou atualizada. Pode haver séries pendentes de vínculo. | A confirmação com data, sessão, exercício, séries, `~` e `—`, o botão **Desfazer** e, se houver pendência, os botões de vínculo |
 | **SEM_SERIES** [herdado] | O relato não tinha séries. Com observação, cria ou atualiza a sessão; sem observação, não cria sessão. | "Não encontrei séries" (ou "anotei") |
 | **NAO_REGISTRADO** [herdado] | Falha depois de salvar o texto (extração, API, validação, observação cheia). O texto bruto continua salvo. | "Salvei o texto, mas não consegui registrar. Reenvie." |
@@ -69,7 +69,7 @@ O resto deste documento trata do **relato**.
 - **Exclusão a pedido (US-12, UC-09):** o administrador apaga mensagens, sessões e séries do usuário; a cópia do backup também é tratada. Prazo de 7 dias corridos; método em D2 do `06-modelo-de-dados.md`.
 - **Uso para análise:** os dados podem ser analisados para entender padrões de uso do teste, mesmo de quem parou de usar, desde que o aviso da boas-vindas diga isso. A exclusão a pedido continua valendo para todos.
 - **Revisão antes de abrir além dos testadores:** decidir o que fica (séries estruturadas) e o que sai (texto bruto, que é o mais sensível), ou anonimizar. Isto não é parecer jurídico.
-- Mensagens `NAO_REGISTRADO` ficam como estão; **reprocessar** é pós-MVP. O usuário reenvia. [herdado]
+- Mensagens `NAO_REGISTRADO` ficam como estão; **reprocessar** é pós-MVP. O usuário reenvia. [herdado] O reprocessamento na subida do serviço (A12) vale só para relatos RECEBIDO e não muda isto. [novo]
 
 ## 6. Pontos abertos
 1. Prazo e método da exclusão (US-12), incluindo o backup. **Fechado em 07/11/2026:** D2 do `06-modelo-de-dados.md`.

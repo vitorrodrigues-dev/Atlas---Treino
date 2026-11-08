@@ -46,6 +46,9 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 **Fluxos alternativos**
 - 1a. A mensagem está fora do assunto (xingamento, dieta, medicação, emergência): o sistema responde conforme **RT-01** e nada é registrado como treino.
 - 1b. A mesma mensagem é entregue duas vezes: o sistema ignora a repetição, sem resposta nova.
+- 1c. O testador edita uma mensagem já enviada: o sistema responde com um aviso que ensina a usar o **Desfazer** e nada é gravado.
+- 1d. O testador envia foto, áudio ou figurinha, mesmo que venha com legenda: o sistema responde "por enquanto só leio texto" e nada é gravado.
+- 1e. A mensagem chega de um grupo, e não da conversa privada com o bot: o sistema a ignora, sem resposta, e nada é gravado. *(1c a 1e decididos em 07/11/2026: A17 de `07-arquitetura.md`.)*
 - 2a. O texto não pôde ser guardado: nada foi registrado; a mensagem é processada quando o sistema voltar (RNF-02).
 - 3a. O serviço de interpretação falha: o texto continua guardado e o sistema avisa "salvei o texto, mas não consegui registrar; reenvie".
 - 4a. A validação recusa (valor fora do intervalo, texto grande demais): tudo ou nada, nenhuma série é gravada, o texto continua guardado e o testador é avisado.
@@ -179,6 +182,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 - 1b. A pessoa já está ATIVA: o sistema responde "já cadastrado".
 - 1c. A pessoa está BLOQUEADA: silêncio total.
 - 1d. A pessoa não cadastrada envia qualquer coisa que não seja `/start`: silêncio. Nada de quem não está ATIVO é guardado.
+- 1e. A pessoa está PENDENTE e envia qualquer coisa que não seja `/start` (texto, outro comando ou toque de botão): silêncio. Nada é gravado; o sistema só confirma ao canal que recebeu a mensagem, para que ela não seja entregue de novo. *(Decidido em 07/11/2026: A16 de `07-arquitetura.md`.)*
 
 **Pós-condição:** a pessoa está PENDENTE e leu o aviso de dados.
 
