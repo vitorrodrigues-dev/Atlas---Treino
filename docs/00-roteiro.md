@@ -14,11 +14,13 @@
 ## Fase 2: Projeto (em andamento)
 - [x] Definições de domínio: sessão, série (campos e tipos), catálogo de exercícios, ciclo de vida do registro
 - [x] Casos de uso (aceitos em 01/11/2026): [documento](02-projeto/05-casos-de-uso.md)
-- [ ] Modelo de dados
-- [ ] Arquitetura
+- [x] Modelo de dados: [documento](02-projeto/06-modelo-de-dados.md)
+- [x] Arquitetura: [documento](02-projeto/07-arquitetura.md)
+- [ ] Revisão de consistência: relatório feito em 08/11/2026, correções em andamento (decisões D14 a D21 no modelo)
+- [ ] Inventário de restrições: rascunho feito, aguardando as respostas do autor (orçamento, acesso ao Oracle da FIAP, notebook ligado, cronograma, local de processamento da API)
 - [ ] Escolha de tecnologias (por último, com o inventário de restrições: banco, custo da API, hospedagem, tempo)
-- Pendências de entrada: as decisões 2 a 5 de 28/10 ainda não têm página em `decisoes/` (a 2 e a 4 mudaram de texto em 01/11/2026, ver o fim dos casos de uso).
-- Próximo passo: modelo de dados (começando pelo mínimo da primeira fatia), a partir dos fluxos alternativos dos casos de uso.
+- Pendências de entrada: as decisões 2 a 5 de 28/10 ainda não têm página em `decisoes/` (a 2 e a 4 mudaram de texto em 01/11/2026, ver o fim dos casos de uso). A decisão 3 não está descrita em nenhum documento.
+- Próximo passo: ler o relatório das correções, commitar, responder o inventário e então escolher tecnologias.
 
 ## Fase 3: Construção (a fazer)
 
