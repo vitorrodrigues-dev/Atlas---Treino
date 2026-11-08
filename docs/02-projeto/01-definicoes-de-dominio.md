@@ -1,8 +1,8 @@
 # Definições de domínio
 
-Fase 2 (Projeto). Atualizado em 27/10/2026, a partir das respostas do autor aos glossários (`01-glossario-de-dominio.md`, `02-glossario-vocabulario-avancado.md` e `03-glossario-catalogo-e-carga.md`). Documento vivo.
+Fase 2 (Projeto). Atualizado em 08/11/2026 pela revisão de consistência; versão base de 27/10/2026, a partir das respostas do autor aos glossários (`01-glossario-de-dominio.md`, `02-glossario-vocabulario-avancado.md` e `03-glossario-catalogo-e-carga.md`). Documento vivo.
 
-Este documento diz o que cada palavra significa **no Atlas**. Os glossários dizem como as pessoas falam; aqui se decide o que o sistema faz com isso. Itens marcados [decidir] seguem abertos.
+Este documento diz o que cada palavra significa **no Atlas**. Os glossários dizem como as pessoas falam; aqui se decide o que o sistema faz com isso.
 
 ---
 
@@ -26,7 +26,7 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 ## Exercício e catálogo
 **Definição:** o exercício oficial é uma variação concreta (ex.: "Supino inclinado halter", "Supino inclinado Smith"). Cada variação é um exercício separado, porque a carga e a forma de registrar não são comparáveis entre equipamentos.
 
-- **Atributos** (metadados, não identidade): movimento-base, equipamento, pegada, ângulo, unilateral ou bilateral. Servem para agrupar e para montar a pergunta quando o nome vem incompleto. **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5).
+- **Atributos** (metadados, não identidade): movimento-base, equipamento, pegada, ângulo, unilateral ou bilateral, grupamento. Servem para agrupar e para montar a pergunta quando o nome vem incompleto. **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5 e D18).
 - **Grupo de variação:** vínculo opcional entre exercícios da mesma família, para comparar sem misturar histórico. **Fora do MVP:** nenhum caso de uso consome este dado; não é armazenado (ver `06-modelo-de-dados.md`, D5).
 - **Tipo de registro** (por exercício): `PESO_E_REPS`, `CORPORAL` (só repetições), `CORPORAL_COM_LASTRO`, `ASSISTIDO`, `DURACAO`. Evita ler "assistida 20" como carga. Barra fixa sem peso é carga 0 quando dito; vazio continua sendo "não dito".
 - **Forma da carga padrão** (por exercício): `POR_LADO` ou `TOTAL`. Ver a regra de carga abaixo.
@@ -35,12 +35,12 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 
 ### Apelidos
 - Pertencem ao **usuário**, são guardados em minúsculas, e cada um aponta para **um único exercício**.
-- Nomes ambíguos não viram apelido global ("remada", "puxada", "pulley", "scott", "cavalinho", "crucifixo"). A série é gravada pendente de vínculo e o bot oferece botões com as **candidatas da ficha do próprio usuário**, sem esperar resposta; ele não assume.
-- Só assume quando houver um único candidato na ficha do usuário, e a confirmação mostra o que ele entendeu.
+- Nomes ambíguos não viram apelido do usuário ("remada", "puxada", "pulley", "scott", "cavalinho", "crucifixo"). A série é gravada pendente de vínculo e o bot oferece botões com as **candidatas do catálogo do próprio usuário**, sem esperar resposta; ele não assume.
+- Só assume quando houver um único candidato no catálogo do usuário, e a confirmação mostra o que ele entendeu.
 
 ### Exercício fora do catálogo
-- Fica registrado como **não catalogado**, com o texto original e as séries já interpretadas, **pendente de vínculo**, sem prazo de expiração no MVP.
-- Quando o usuário tocar no botão de uma candidata, a série é ligada a esse exercício **do catálogo dele**. Se nenhuma candidata serve, a série continua pendente e o administrador acrescenta o exercício pela ficha (UC-10). Nunca se cria exercício oficial automaticamente.
+- Fica registrado como **não catalogado**, com o texto bruto e as séries já interpretadas, **pendente de vínculo**, sem prazo de expiração no MVP.
+- Quando o usuário tocar no botão de uma candidata, a série é ligada a esse exercício **do catálogo dele**. Se nenhuma candidata serve, a série continua pendente e o administrador acrescenta o exercício ao catálogo (UC-10); não há vínculo retroativo, o testador desfaz e reenvia (D16 do `06-modelo-de-dados.md`). Nunca se cria exercício oficial automaticamente.
 
 ---
 
@@ -52,8 +52,8 @@ Este documento diz o que cada palavra significa **no Atlas**. Os glossários diz
 ### Leitura de "NxM" (decidido em 27/10/2026)
 - **O bot assume a notação convencional:** "3x10" é 3 séries de 10 repetições, e é o que foi realizado. A confirmação mostra "3 séries de 10 repetições", e o `/desfazer` corrige se estiver errado.
 - **Com unidade, é carga:** "3x20kg" é 3 séries com 20 kg, repetições não ditas (vazio, nunca 0).
-- **Quando há outro "NxM" na mesma frase** (ex.: "halter 2x20, 3x10"), o bot confirma antes de tratar o primeiro como "2 halteres de 20".
-- **Quando não há como resolver o exercício:** a série é gravada pendente de vínculo e o bot oferece botões com as candidatas, sem esperar resposta. Por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, de 30 minutos).
+- **Quando há outro "NxM" na mesma frase** (ex.: "halter 2x20, 3x10"), o bot grava na hora lendo o primeiro como "2 halteres de 20", mostra essa leitura na confirmação e o Desfazer corrige se estiver errada. Não há pergunta pendente (formato da decisão 2; decidido em 08/11/2026 por delegação do autor).
+- **Quando não há como resolver o exercício:** a série é gravada pendente de vínculo e o bot oferece botões com as candidatas, sem esperar resposta, quando houver candidatas (até 5, D15); sem candidatas, a série fica pendente sem botões. Por exemplo, "3x10" sem exercício e sem exercício recente claro (depende da janela de contexto da US-02, de 30 minutos).
 - O prompt v4 precisa de regra e de casos de regressão para isso.
 
 ### Carga (decidido em 27/10/2026)
@@ -61,7 +61,7 @@ A forma da carga **padrão fica no exercício**, e a série guarda o que foi dit
 
 | Campo da etapa | Observação |
 |---|---|
-| Texto original da carga | Prova do que o usuário escreveu |
+| Carga como escrita | Prova do que o usuário escreveu |
 | Número informado | Vazio = não dito (nunca 0); aproximado? |
 | Forma declarada | por lado, total ou não declarada |
 | Carga normalizada | Na forma padrão do exercício; vazia se não der para calcular |
@@ -119,6 +119,6 @@ Regras:
 ---
 
 ## Pontos abertos
-1. Validar a janela de 30 minutos da US-02 depois da primeira semana de teste.
+1. Validar a janela de 30 minutos da US-02 depois da primeira semana de teste. **Fechado em 08/11/2026:** 30 minutos, contados pelo envio da mensagem (D21 do `06-modelo-de-dados.md`, decidido por delegação do autor); rever depois da primeira semana é ajuste normal, não pendência.
 2. Prazo e método da exclusão de dados (US-12). **Fechado em 07/11/2026:** D2 do `06-modelo-de-dados.md`.
 3. Página em `decisoes/` para as decisões de catálogo e carga (opcional).

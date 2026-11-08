@@ -1,7 +1,7 @@
 # Decisão: aquecimento é registrado como tipo da série (US-18 entra no MVP)
 
 Data: 26/10/2026
-Status: aceita
+Status: aceita, com o item 7 superado pela decisão 2 de 01/11/2026
 
 ## Contexto
 A US-18 estava pendente (MVP ou Pós-MVP). O relato é texto livre, então o usuário vai mencionar aquecimento naturalmente. Sem regra, o extrator grava o aquecimento como série de trabalho e suja a última carga e a evolução. Além disso, "com quanto aqueci no leg press semana passada" é uma consulta legítima: o dado precisa existir.
@@ -13,7 +13,7 @@ A US-18 estava pendente (MVP ou Pós-MVP). O relato é texto livre, então o usu
 4. `/carga` mostra todas as séries do último treino, com o tipo marcado.
 5. A evolução (US-19) conta só séries de `TRABALHO`.
 6. Aquecimento específico (cita exercício e carga ou repetições) vira série. Aquecimento geral (esteira, mobilidade) vai para a observação do dia, como o cardio.
-7. "Aqueci com 20kg" sem exercício: o bot pergunta o exercício, ou assume o último citado se a janela de contexto (US-02, ainda a definir) deixar claro.
+7. "Aqueci com 20kg" sem exercício: o bot pergunta o exercício, ou assume o último citado se a janela de contexto (US-02, 30 minutos) deixar claro. *Superada pela decisão 2 de 01/11/2026: o bot não pergunta; sem exercício dentro da janela, a série é gravada pendente de vínculo.*
 8. Gírias de academia (rest-pause, cluster etc.) não são tema do MVP. O prompt v4 trata os casos que aparecerem no teste real, com regressão. Exceção: drop set (US-17).
 
 ## Opções rejeitadas

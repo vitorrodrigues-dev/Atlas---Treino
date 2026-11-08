@@ -31,7 +31,7 @@ Como praticante, quero mandar o treino em mensagens curtas, uma série por vez, 
 
 Fase: MVP. Decidido em 25/10/2026: o bot guarda o contexto entre mensagens. Janela de 30 minutos, decidida em 27/10/2026 e ajustável depois da primeira semana de teste.
 - Dado que citei o exercício há até 30 minutos, quando envio "2ª série, 55kg", então a série vai para esse exercício e a confirmação mostra qual exercício foi assumido.
-- Dado que não está claro a qual exercício a série pertence, quando envio a mensagem, então a série é gravada pendente de vínculo e a confirmação traz botões com as candidatas; o bot não assume.
+- Dado que não está claro a qual exercício a série pertence, quando envio a mensagem, então a série é gravada pendente de vínculo e a confirmação traz botões com as candidatas quando houver candidatas (até 5, D15); sem candidatas, a série fica pendente sem botões; o bot não assume.
 - Dado uma série gravada pendente de vínculo, quando toco no botão de uma das candidatas, então a série é ligada a esse exercício; o botão não tem prazo e vale enquanto a série estiver pendente e não tiver sido desfeita.
 
 ### US-03 Ver o que o bot entendeu
@@ -88,7 +88,8 @@ Fase: Pós-MVP. É um épico e deve ser fatiado em carga por período, treino de
 Como praticante, quero perguntar como evoluí em um exercício ao longo das semanas, para ver meu progresso sem esperar o site.
 
 Fase: MVP. Hipótese: a evolução é o valor mais citado na pesquisa (10 de 20), mas só 2 sentem falta de um lugar para ver. O uso desse comando será medido no teste. A tela de celular (US-14) continua Pós-MVP.
-- Dado um exercício com registros em datas diferentes, quando envio o comando de evolução com o nome ou o apelido, então recebo a maior carga de trabalho de cada sessão, com a data, da mais antiga à mais recente sem filtro de período.
+- Dado um exercício com carga (peso e repetições, ou peso corporal com lastro) com registros em datas diferentes, quando envio o comando de evolução com o nome ou o apelido, então recebo a maior carga de trabalho de cada sessão, com a data, da mais antiga à mais recente sem filtro de período.
+- Dado um exercício assistido, só de peso corporal ou de duração, quando consulto a evolução, então o bot avisa que ainda não acompanha a evolução desse tipo de exercício (decidido em 08/11/2026 por delegação do autor).
 - Dado menos de 3 sessões com carga de trabalho do exercício, quando consulto, então o bot informa que ainda não há dados suficientes.
 - Dado registros desfeitos, quando consulto, então eles não aparecem.
 
@@ -166,7 +167,7 @@ Fase: MVP. No início o administrador pode apagar direto no banco.
 - Dado um pedido de exclusão, quando o administrador o atende em até 7 dias corridos, então mensagens, sessões e séries desse testador deixam de existir no banco.
 - Dado que a exclusão foi feita, quando o testador pergunta, então ele recebe a confirmação.
 - Dado o backup semanal, quando uma exclusão é feita, então a cópia do backup que contém esses dados também é tratada: backups são guardados por no máximo 30 dias e, se um backup for restaurado, as exclusões já feitas são refeitas.
-- Dado um pedido de exclusão, quando o testador não pede para sair, então só o histórico é apagado e ele continua ativo, com a ficha e os apelidos.
+- Dado um pedido de exclusão, quando o testador não pede para sair, então só o histórico é apagado e ele continua ativo, com o catálogo e os apelidos.
 
 ## Requisitos não funcionais
 
@@ -182,7 +183,7 @@ Fase: MVP. O modelo não deve deduzir campos não ditos; isso vira regra do prom
 
 Como praticante, quero que meus relatos não se percam nem se dupliquem se o bot cair, para não refazer anotações.
 
-Fase: MVP.
+Fase: MVP. Limite conhecido: o canal só guarda mensagens não buscadas por até 24 horas; depois disso elas se perdem.
 - Dado que o bot ficou fora do ar, quando volta, então processa as mensagens pendentes sem duplicar.
 - Dado que o texto chegou ao banco, quando a extração falha, então o texto original permanece salvo.
 

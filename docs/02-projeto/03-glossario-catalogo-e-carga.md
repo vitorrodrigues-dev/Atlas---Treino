@@ -190,6 +190,8 @@ Resposta direta: mantenha a forma da carga (POR_LADO/TOTAL) fixada no exercício
 
 ## 11. Decisões que o autor precisa tomar
 
+> As sete decisões abaixo já foram tomadas em `01-definicoes-de-dominio.md` (27/10/2026) e `06-modelo-de-dados.md` (07/11/2026). A lista fica como registro da pesquisa.
+
 1. Afundo/búlgaro e outros exercícios de perna com dois halteres serão POR_LADO ou TOTAL? StrengthLog e Strength Level divergem.
 2. Em exercícios com barra, o total inclui a barra? E o que fazer quando o peso da barra é desconhecido?
 3. A série terá um campo de local/equipamento (academia) para separar históricos de Smith/cabo?

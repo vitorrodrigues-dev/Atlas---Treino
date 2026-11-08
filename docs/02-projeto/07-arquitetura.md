@@ -1,6 +1,6 @@
 # Arquitetura (lógica)
 
-Fase 2 (Projeto). **Redigido em 07/11/2026 com assistência de IA (Claude). Aceito pelo autor em 07/11/2026.** Documento vivo.
+Fase 2 (Projeto). **Redigido em 07/11/2026 com assistência de IA (Claude). Aceito pelo autor em 07/11/2026.** Atualizado em 08/11/2026 pela revisão de consistência (A19, A20 e emendas ao A12, A15 e A17, decididas por delegação do autor). Documento vivo.
 
 Fontes: `06-modelo-de-dados.md`, `05-casos-de-uso.md`, `04-ciclo-de-vida-do-registro.md`, `03-user-stories.md` (RNF-01 a 05) e, como fonte de aprendizado, o `progresso.md` do repositório antigo (marcado **[v1]** onde uma decisão vem de um erro ou acerto de lá).
 
@@ -23,7 +23,7 @@ O que a arquitetura precisa garantir, e onde cada exigência vira decisão.
 | RNF-04 Orçamento | Uma chamada ao serviço de interpretação por relato, nunca por comando | A5, A11 |
 | RNF-05 Resposta rápida | Consultas sem chamada externa; tempo medido no teste | A5, A14 |
 | US-09, RT-01 Tom e limites | Todas as frases são do sistema; o texto de emergência é fixo | A4, A10 |
-| Um desenvolvedor, ~15 testadores | Poucas peças, camadas legíveis, sem abstração antecipada | A8, A9 |
+| Um desenvolvedor, ~15 testadores (estimativa de trabalho; o número final está em aberto no escopo) | Poucas peças, camadas legíveis, sem abstração antecipada | A8, A9 |
 | Evolução futura | Trocar o canal (WhatsApp) e o interpretador sem mexer nas regras | A9 |
 
 ## 3. Contexto
@@ -58,8 +58,8 @@ flowchart TB
 
 | Componente | Responsabilidade | Não faz |
 |---|---|---|
-| **Adaptador de canal** | Recebe do canal e entrega ao Roteador um **evento canônico** (texto, comando, toque de botão, edição, mídia). Envia respostas. Conhece a mecânica de entrega do canal e a confirmação de recebimento | Regra de negócio. Não sabe o que é uma série |
-| **Roteador** | Identifica o remetente, aplica o **portão de status** (A16) e decide o destino: silêncio, caso de uso ou aviso | Gravar dados de treino |
+| **Adaptador de canal** | Recebe do canal e entrega ao Roteador um **evento canônico** (texto, comando, toque de botão, edição, conteúdo que não é texto), com a **origem**: conversa privada ou grupo (A20). Envia respostas. Conhece a mecânica de entrega do canal e a confirmação de recebimento | Regra de negócio. Não sabe o que é uma série |
+| **Roteador** | Descarta o evento de grupo (A20) e, só então, identifica o remetente, aplica o **portão de status** (A16) e decide o destino: silêncio, caso de uso ou aviso | Gravar dados de treino |
 | **Casos de uso** | Um por UC (UC-01 a UC-07). Orquestram: abrem e fecham transação, chamam repositórios, interpretador e domínio, escolhem a resposta | Regra de conversão (fica no domínio) |
 | **Domínio** | Funções puras, sem entrada nem saída: valida limites (R16), expande "NxM" em séries, normaliza carga, casa o texto com exercício (apelido, nome oficial, todas as palavras), decide a sessão e a janela de contexto de 30 minutos | Banco, rede, relógio fixo |
 | **Repositórios** | Leem e gravam as entidades do modelo. **Toda operação recebe o usuário** e filtra por ele (A6) | Controlar transação (A7) |
@@ -83,7 +83,7 @@ sequenceDiagram
     C->>R: evento: texto
     R->>R: identifica remetente, confere status ATIVO
     R->>U: relato
-    U->>B: T1 grava a mensagem crua (resultado RECEBIDO)
+    U->>B: T1 grava o texto bruto (resultado RECEBIDO)
     B-->>U: gravada, ou já gravada (reentrega)
     Note over U,B: T1 confirmada e conexão liberada
     U-->>C: pode esquecer a mensagem
@@ -99,9 +99,11 @@ Desvios, todos como **resultado**, não como exceção (A3):
 - **Reentrega (1b):** T1 responde "já gravada"; silêncio.
 - **T1 falha (2a):** nada foi salvo; o canal reentrega; conta para o teto de tentativas (A1).
 - **Interpretador falha (3a):** mensagem vira NAO_REGISTRADO, motivo EXTRACAO_FALHOU; o texto fica salvo e o usuário recebe "salvei o texto, mas não consegui registrar; reenvie".
+- **Fora do assunto (3b):** a categoria só existe na leitura bruta que o interpretador devolve, depois da T1. Xingamento, dieta ou medicação e emergência: SEM_SERIES, sem sessão nem observação, e a resposta é a do RT-01. Dor ou lesão: registra normalmente e acrescenta a resposta do RT-01.
 - **Validação recusa (4a):** NAO_REGISTRADO, motivo VALIDACAO_RECUSOU; nenhuma série é gravada (tudo ou nada).
 - **Sem séries (4b):** SEM_SERIES, com observação cria ou atualiza a sessão.
 - **Observação cheia:** NAO_REGISTRADO, motivo OBSERVACAO_CHEIA.
+- **Falha na T2 que não é validação (6g):** NAO_REGISTRADO, motivo ERRO_INTERNO; o texto fica salvo e o usuário recebe o aviso de reenviar (D19 de `06-modelo-de-dados.md`).
 - **Queda entre T1 e T2:** a mensagem fica RECEBIDA; na subida do serviço é reprocessada (A12).
 
 ### 5.2 UC-03 Desfazer (comando ou botão)
@@ -110,7 +112,7 @@ Sem interpretador. O caso de uso localiza a mensagem alvo (a última válida de 
 
 ### 5.3 UC-02 Vincular exercício (botão)
 
-Sem interpretador. Só vale se a série ainda está pendente e a mensagem de origem não foi desfeita. Liga a série ao exercício, **e só** cria apelido se `motivo_pendencia = NAO_CATALOGADO` e o texto relatado não está vazio, tudo na mesma transação. Série já vinculada: responde a qual exercício está ligada.
+Sem interpretador. Só vale se a série ainda está pendente e a mensagem de origem não foi desfeita. Liga ao exercício **todas as séries pendentes da mesma mensagem com o mesmo `exercicio_relatado`**, e só cria apelido se `motivo_pendencia = NAO_CATALOGADO`, o texto relatado não está vazio e ainda não existe apelido com esse texto (R2); se já existe, não cria nem altera, só vincula. Tudo na mesma transação. Séries de outras mensagens não são afetadas (D14 de `06-modelo-de-dados.md`). Série já vinculada: responde a qual exercício está ligada.
 
 ### 5.4 UC-04 e UC-05 Consultas
 
@@ -145,10 +147,10 @@ Critério usado: poucas peças, o mínimo de esforço para o testador, nada que 
 
 | # | Decisão | Por quê | Origem |
 |---|---|---|---|
-| A1 | A entrega do canal é **pelo menos uma vez**. O canal só é liberado da mensagem **depois de T1** (texto cru gravado), ou de uma falha que repetir não resolve (recusa do banco, erro de programação). Falha de conexão **não libera**: o sistema espera e repete, com teto de 10 tentativas, porque a classificação do erro pode errar | A única cópia da mensagem está no canal até T1. Liberar antes é jogar o relato fora | **[v1]** |
+| A1 | A entrega do canal é **pelo menos uma vez**. O canal só é liberado da mensagem **depois de T1** (texto bruto gravado), ou de uma falha que repetir não resolve (recusa do banco, erro de programação). Falha de conexão **não libera**: o sistema espera e repete, com teto de 10 tentativas, porque a classificação do erro pode errar | A única cópia da mensagem está no canal até T1. Liberar antes é jogar o relato fora | **[v1]** |
 | A2 | **Duas transações** em torno da chamada externa. A conexão com o banco **não fica aberta** durante a chamada ao interpretador | A chamada pode levar até um minuto; conexão presa em T1 esgota o banco e prende o rollback | **[v1]** |
 | A3 | Falha depois de T1 é um **resultado** (NAO_REGISTRADO com motivo), nunca uma exceção que escapa | Se a falha fosse exceção, o canal reentregaria e a reentrega cairia em "já gravada", deixando a mensagem sem resposta para sempre | **[v1]** |
-| A12 | Na subida do serviço, relatos **RECEBIDO** são reprocessados uma vez. Se falharem de novo, viram NAO_REGISTRADO com o motivo da falha e o testador recebe o aviso de reenviar | O testador não precisa reenviar depois de uma queda, e o reprocessamento é seguro porque T2 é tudo ou nada. Não exige coluna nem motivo novo | Nova |
+| A12 | Na subida do serviço, cada relato **RECEBIDO** com `reprocessado_em` vazio ganha `reprocessado_em` numa transação curta **antes** da chamada externa e é reprocessado; se falhar, vira NAO_REGISTRADO com o motivo da falha. Relato RECEBIDO que já tem `reprocessado_em` vira NAO_REGISTRADO, motivo ERRO_INTERNO. Nos dois casos o testador recebe o aviso de reenviar | O testador não precisa reenviar depois de uma queda, e o reprocessamento é seguro porque T2 é tudo ou nada. A marca gravada antes da chamada impede o laço de queda: um relato que derruba o serviço é tentado uma vez só | Nova; emenda D19 de `06-modelo-de-dados.md` (decidido em 08/11/2026 por delegação do autor) |
 
 ### Interpretador
 
@@ -164,7 +166,7 @@ Critério usado: poucas peças, o mínimo de esforço para o testador, nada que 
 |---|---|---|---|
 | A6 | **Isolamento por usuário nos repositórios**: toda operação recebe o usuário e o filtra, e a consulta de série filtra por usuário na sessão **e** na mensagem (R5) | O banco não impede a mensagem do usuário A de apontar para a sessão do B; a barreira precisa estar onde o dado é lido | **[v1]**, RNF-03 |
 | A7 | A **transação pertence ao caso de uso**. Os repositórios recebem a conexão e não abrem a própria | Se cada repositório abrisse a sua, sessão e séries ficariam em transações diferentes e um erro deixaria metade gravada | **[v1]** |
-| A8 | **Processamento serial**: um evento por vez, na ordem de chegada (relatos, comandos e toques) | A ordem importa (contexto de 30 minutos, sessão padrão do dia) e serial evita condição de corrida na criação da sessão. Para ~15 testadores a espera é de segundos | Nova |
+| A8 | **Processamento serial**: um evento por vez, na ordem de chegada (relatos, comandos e toques) | A ordem importa (contexto de 30 minutos, sessão padrão do dia) e serial evita condição de corrida na criação da sessão. Para ~15 testadores (estimativa de trabalho; o número final está em aberto no escopo) a espera é de segundos | Nova |
 | A9 | **Só duas portas**: Canal e Interpretador, cada uma com implementação real e falsa; relógio injetável. Repositórios são concretos, testados contra banco real | Só abstrai onde há duas implementações à vista (Telegram e WhatsApp; modelo real e falso). Abstração antecipada além disso vira código que o autor não domina | Documentos |
 | A10 | **Todas as frases do bot em um módulo único de textos**, com o texto de emergência fixo. Texto ainda não revisado leva a marca PROVISÓRIO e o teste confere que nenhuma sobrou | US-09 pede revisão das frases antes do teste | **[v1]** |
 | A16 | **Portão de status** (tabela abaixo) no Roteador, antes de qualquer caso de uso | Uma regra só decide quem é ouvido; nada de quem não está ATIVO é gravado | **[v1]**, UC-06 |
@@ -178,6 +180,8 @@ Portão de status:
 | ATIVO | "já cadastrado" | Segue para o caso de uso; `/aprovar` só se `eh_administrador` |
 | BLOQUEADO | **Silêncio** | **Silêncio** |
 
+A tabela vale só para a conversa privada: evento de grupo é descartado antes do portão, sem identificar o remetente (A20).
+
 ### Operação
 
 | # | Decisão | Por quê | Origem |
@@ -185,8 +189,10 @@ Portão de status:
 | A11 | **3 falhas seguidas** do interpretador avisam o administrador pelo canal, uma vez até voltar ao normal | Crédito acabado ou chave inválida fariam todo relato falhar sem ninguém perceber, e o teste ficaria distorcido | Nova |
 | A13 | **Log só com código, classe e duração.** Nunca texto, nome, identificador de usuário nem token. Exceções de rede guardam só o nome da classe, porque a mensagem pode trazer a URL com o token. Início e parada do serviço ficam registrados | RNF-03; o escopo pede registrar os períodos fora do ar | **[v1]**, RNF-03 |
 | A14 | **Sem tabela de métricas.** As métricas do teste saem de consultas ao banco (usuários aprovados e ativos por semana, relatos sem `desfeita_em`, uso de `/evolucao`) e do log (tempo de resposta, quedas). O custo vem do painel do provedor | Tudo que a métrica precisa já está no modelo; tabela nova seria dado duplicado | Nova |
-| A15 | **Administração fora do bot**: ficha (UC-10), exclusão (UC-09) e bloquear são scripts no banco. O único comando do administrador no bot é `/aprovar` | Menos superfície de ataque e menos código; o administrador é um só | Documentos (decisão 4) |
-| A17 | **Eventos não suportados:** edição de mensagem recebe aviso que ensina o Desfazer; foto, áudio e figurinha recebem "por enquanto só leio texto", **mesmo com legenda**, que não é lida como relato; mensagem em grupo é ignorada. **Nada é gravado** em nenhum desses casos | O testador não fica sem resposta, e dado que não é relato não entra no banco | **[v1]**, ciclo §1; legenda: autor, 07/11/2026 |
+| A15 | **Administração fora do bot**: catálogo (UC-10), exclusão (UC-09) e bloquear são scripts no banco. O único comando do administrador no bot é `/aprovar`. O primeiro administrador é criado por script (status ATIVO, `eh_administrador` = sim); `/aprovar` só vale de ATIVO com `eh_administrador` | Menos superfície de ataque e menos código; o administrador é um só | Documentos (decisão 4); primeiro administrador: emenda decidida em 08/11/2026 por delegação do autor |
+| A17 | **Eventos não suportados:** edição de mensagem recebe aviso que ensina o Desfazer; qualquer conteúdo que não seja texto (foto, vídeo, áudio, figurinha, documento) recebe "por enquanto só leio texto", **mesmo com legenda**, que não é lida como relato; mensagem em grupo é ignorada (antes do portão, A20). **Nada é gravado** em nenhum desses casos | O testador não fica sem resposta, e dado que não é relato não entra no banco | **[v1]**, ciclo §1; legenda: autor, 07/11/2026; qualquer conteúdo que não seja texto: emenda decidida em 08/11/2026 por delegação do autor |
+| A19 | Ao atingir o **teto de 10 tentativas** do A1, o sistema libera a mensagem, registra só o código no log (A13) e avisa o administrador uma vez, como no A11. A perda é aceita e fica registrada na seção 9 | O processamento é serial (A8): uma mensagem que nunca passa travaria todos os testadores | Nova (decidido em 08/11/2026 por delegação do autor) |
+| A20 | O evento canônico traz a **origem** (conversa privada ou grupo). O filtro de grupo vem **antes** do portão de status (A16) | Sem isso, um `/start` de desconhecido num grupo criaria um usuário PENDENTE | Nova (decidido em 08/11/2026 por delegação do autor) |
 
 ## 8. O que a arquitetura exige da etapa de tecnologias
 
@@ -195,11 +201,11 @@ Checklist que cada opção precisa cumprir. Nenhuma tecnologia está escolhida.
 | # | Exigência | Vem de |
 |---|---|---|
 | 1 | Banco com **transações**, restrições de unicidade (R1 a R3, R7) e de intervalo (R16). Chave composta ou verificação equivalente para R4 e R5 | Modelo, A7 |
-| 2 | Backup agendável e descarte de cópias com mais de 30 dias | D2 |
+| 2 | Backup semanal agendável e descarte de cópias com mais de 30 dias | D2, US-12 |
 | 3 | Canal com entrega confirmável (A1) e botões em linha. O modo de entrega (consulta periódica ou chamada de volta) decide a hospedagem: chamada de volta exige endereço público com HTTPS | A1, UC-01 |
 | 4 | Execução contínua de um processo, com reinício controlado e saída limpa. O custo de ficar fora do ar é aceito no teste (RNF-05) | Escopo |
 | 5 | Segredos só em variáveis de ambiente e fora do repositório | RNF-03 |
-| 6 | Serviço de interpretação com **saída estruturada**, modelo de versão fixa e temperatura 0, custo por chamada conhecido e crédito pré-pago sem recarga automática | RNF-01, RNF-04, A18 |
+| 6 | Serviço de interpretação com **saída estruturada**, modelo de versão fixa e temperatura 0, custo por chamada conhecido, crédito pré-pago sem recarga automática e comportamento conhecido quando o modelo recusa uma resposta, testado com a lista de regressão do RT-01 (A18) | RNF-01, RNF-04, A18, RT-01 |
 | 7 | Testes de integração contra o banco real e contra implementações falsas do canal e do interpretador | A9 |
 | 8 | Linguagem e ferramentas que o autor consiga ler, explicar e manter sozinho | Objetivo do projeto |
 | 9 | Local dos dados e do processamento compatível com o aviso da boas-vindas (o texto passa por API externa) | US-11, LGPD |
@@ -208,9 +214,10 @@ O **inventário de restrições** (banco, custo da API, hospedagem, tempo) é o 
 
 ## 9. Riscos e limites conhecidos
 
-- **Notebook fora do ar:** o serviço para; as mensagens esperam no canal. Aceito no teste e registrado como feedback (RNF-05). O canal só guarda mensagens por tempo limitado, então uma queda longa perde relatos; o tempo exato depende do canal e vira dado do inventário.
+- **Notebook fora do ar:** o serviço para; as mensagens esperam no canal. Aceito no teste e registrado como feedback (RNF-05). O canal só guarda mensagens não buscadas por até 24 horas (ver `08-inventario-de-restricoes.md`), então uma queda maior que isso perde relatos.
 - **Classificação de RT-01 pelo modelo:** um falso negativo envia uma mensagem de emergência ao registro, que responde "não encontrei séries". Mitigação: lista de regressão de mensagens de RT-01 e texto fixo. Não elimina o risco; vale registrar no aviso de dados.
-- **Processamento serial:** vários testadores relatando ao mesmo tempo esperam na fila; para ~15, aceito. Revisar com o tempo de resposta medido.
+- **Processamento serial:** vários testadores relatando ao mesmo tempo esperam na fila; para ~15 (estimativa de trabalho; o número final está em aberto no escopo), aceito. Revisar com o tempo de resposta medido.
+- **Teto de tentativas (A19):** uma mensagem que não passa da T1 depois de 10 tentativas é liberada e se perde; o administrador é avisado uma vez e o log guarda só o código. Aceito para não travar o processamento serial.
 - **Confirmação acima do limite do canal:** relato com muitas séries pode gerar resposta maior que o canal aceita. Regra de arquitetura: o Textos do bot resume e avisa; o dado continua gravado.
 - **Queda entre a gravação e a resposta:** na subida, a mensagem já REGISTRADA responde em silêncio (a confirmação já foi enviada na maioria dos casos). Limitação aceita, como no repositório antigo.
 - **Reprocessamento (A12):** pode gastar uma chamada a mais por relato interrompido; custo desprezível.
@@ -226,8 +233,9 @@ O **inventário de restrições** (banco, custo da API, hospedagem, tempo) é o 
 | UC-06 e UC-07 | Adaptador, Roteador (portão), Caso de uso, Repositórios, Textos | A16 |
 | UC-09 e UC-10 | Scripts do administrador, Banco | A15, R4, R14, R15 |
 | RT-01 | Interpretador (categoria), Textos | A4, A10, A18 |
+| Transversais | Todos | A8, A9, A10, A11, A13, A14, A18, A19, A20 |
 
-## 11. Ajustes em outros documentos se este for aceito
+## 11. Ajustes aplicados em 07/11/2026
 
 - `00-roteiro.md`: marcar "Arquitetura" e trocar o próximo passo por "inventário de restrições e escolha de tecnologias".
 - `05-casos-de-uso.md`: UC-06 fluxo alternativo para PENDENTE que envia outra coisa que não `/start` (silêncio, A16); UC-01 com a regra da mídia e da edição (A17).

@@ -1,6 +1,10 @@
 # Glossário de domínio: linguagem da musculação
 
 > Os itens marcados [decidir] abaixo foram decididos em `01-definicoes-de-dominio.md` (27/10/2026).
+>
+> Extrator, interpretador e serviço de interpretação são o mesmo componente (a IA que lê o relato); "extrator" permanece nos nomes `versao_extrator` e `EXTRACAO_FALHOU` (08/11/2026).
+>
+> "Catálogo" é o dado do sistema (os exercícios de cada testador); "ficha" é o documento de treino que o testador envia (08/11/2026).
 
 Fase 2 (Projeto). Pesquisa de 27/10/2026, tópico 1: sessão, série e vocabulário em volta deles.
 
@@ -59,7 +63,7 @@ Ponto em que não dá para fazer mais uma repetição com boa técnica (falha co
 | **Myo-reps** | Variante padronizada do rest-pause: série de ativação e várias minisséries. | A mesma | Curta |
 | **Bi-set / super-set** | Dois exercícios alternados. Não é uma série com etapas. | Cada exercício a sua | Entre os exercícios |
 
-- **Observação para o modelo de dados** [hipótese]: drop set, rest-pause, cluster e myo-reps têm a mesma forma, uma série com várias etapas (carga e repetições por etapa). A tabela `serie_etapa` do drop set talvez já sirva para todos, mudando só o rótulo da técnica. Confirmar na modelagem.
+- **Observação para o modelo de dados** [hipótese]: drop set, rest-pause, cluster e myo-reps têm a mesma forma, uma série com várias etapas (carga e repetições por etapa). A entidade ETAPA (`06-modelo-de-dados.md`) do drop set talvez já sirva para todos, mudando só o rótulo da técnica. Confirmar na modelagem.
 - No MVP só o drop set (US-17) entra. Bi-set e tri-set estão fora (decisão anterior).
 
 ## 9. Carga

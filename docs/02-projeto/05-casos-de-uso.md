@@ -24,7 +24,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 | UC-07 | Aprovar testador | Administrador | US-08 |
 | UC-08 | (rebaixado a regra RT-01) | | US-10 |
 | UC-09 | Excluir dados a pedido | Administrador | US-12 |
-| UC-10 | Cadastrar a ficha do testador | Administrador | lacuna da revisão de 28/10 |
+| UC-10 | Cadastrar o catálogo a partir da ficha do testador | Administrador | lacuna da revisão de 28/10 |
 
 ---
 
@@ -36,7 +36,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 
 **Fluxo principal**
 1. O testador envia o texto relatando o treino.
-2. O sistema guarda o texto original.
+2. O sistema guarda o texto bruto.
 3. O sistema envia o texto ao serviço de interpretação, que devolve exercícios, séries, cargas, repetições e observações.
 4. O sistema valida o resultado. O que o testador não disse fica vazio, nunca preenchido por suposição (RNF-01).
 5. O sistema identifica a sessão: a do dia, ou uma nova se o testador pediu ("segundo treino").
@@ -44,25 +44,27 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 7. O sistema envia a confirmação com data, sessão, exercícios e séries (`~` no aproximado, `—` no que não foi dito), o tipo das séries que não são de trabalho, as etapas de um drop set e o botão **Desfazer**.
 
 **Fluxos alternativos**
-- 1a. A mensagem está fora do assunto (xingamento, dieta, medicação, emergência): o sistema responde conforme **RT-01** e nada é registrado como treino.
+- 1a. *(Movido para 3b em 08/11/2026: a categoria "fora do assunto" só existe depois da leitura do serviço de interpretação.)*
 - 1b. A mesma mensagem é entregue duas vezes: o sistema ignora a repetição, sem resposta nova.
 - 1c. O testador edita uma mensagem já enviada: o sistema responde com um aviso que ensina a usar o **Desfazer** e nada é gravado.
-- 1d. O testador envia foto, áudio ou figurinha, mesmo que venha com legenda: o sistema responde "por enquanto só leio texto" e nada é gravado.
-- 1e. A mensagem chega de um grupo, e não da conversa privada com o bot: o sistema a ignora, sem resposta, e nada é gravado. *(1c a 1e decididos em 07/11/2026: A17 de `07-arquitetura.md`.)*
+- 1d. O testador envia qualquer conteúdo que não seja texto (foto, vídeo, áudio, figurinha, documento), mesmo que venha com legenda: o sistema responde "por enquanto só leio texto" e nada é gravado.
+- 1e. A mensagem chega de um grupo, e não da conversa privada com o bot: o sistema a ignora, sem resposta, e nada é gravado. *(1c a 1e decididos em 07/11/2026: A17 de `07-arquitetura.md`. 1d ampliado para qualquer conteúdo que não seja texto: decidido em 08/11/2026 por delegação do autor.)*
 - 2a. O texto não pôde ser guardado: nada foi registrado; a mensagem é processada quando o sistema voltar (RNF-02).
 - 3a. O serviço de interpretação falha: o texto continua guardado e o sistema avisa "salvei o texto, mas não consegui registrar; reenvie".
+- 3b. A leitura do serviço de interpretação classifica a mensagem como fora do assunto (xingamento, dieta ou medicação, emergência): o sistema responde conforme **RT-01**, o relato fica com resultado SEM_SERIES, sem sessão nem observação, e nada é registrado como treino. Dor ou lesão segue o 6f. *(Decidido em 08/11/2026 por delegação do autor.)*
 - 4a. A validação recusa (valor fora do intervalo, texto grande demais): tudo ou nada, nenhuma série é gravada, o texto continua guardado e o testador é avisado.
 - 4b. O relato não tem séries: se tem observação, cria ou atualiza a sessão e responde que anotou; se não tem, não cria sessão e responde que não encontrou séries.
 - 5a. O testador diz "segundo treino" ou "treino da noite": o sistema abre uma nova sessão no mesmo dia.
-- 6a. O exercício não está no catálogo do testador: a série é gravada com o exercício oficial vazio ("não catalogado"), a confirmação diz "Não reconheci: ..." e a série fica pendente de vínculo (UC-02). Nunca se cria exercício oficial automaticamente.
-- 6b. O nome pode ser vários exercícios da ficha ("remada"): a série é gravada pendente e a confirmação traz botões com as candidatas (UC-02). *(Decisão 2, aceita em 01/11/2026.)*
-- 6c. A mensagem não cita exercício ("2ª série, 55kg"): se o último exercício citado está dentro da janela de 30 minutos, a série vai para ele e a confirmação diz qual foi assumido; senão, vale 6b.
+- 6a. O exercício não está no catálogo do testador: a série é gravada com o exercício oficial vazio ("não catalogado"), a confirmação diz "Não reconheci: <texto>" e a série fica pendente de vínculo. Se algum exercício do catálogo compartilha ao menos uma palavra com o texto dito, a confirmação traz até 5 botões de candidatas (UC-02); se nenhum compartilha, não há botões. Nunca se cria exercício oficial automaticamente. *(Candidatas: D15 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
+- 6b. O nome pode ser vários exercícios do catálogo ("remada"): a série é gravada pendente e a confirmação traz até 5 botões com as candidatas que o casamento achou (UC-02). *(Decisão 2, aceita em 01/11/2026; limite de 5 pelo D15, decidido em 08/11/2026 por delegação do autor.)*
+- 6c. A mensagem não cita exercício ("2ª série, 55kg"): se o último exercício citado está dentro da janela de 30 minutos (contada pelo envio da mensagem; relato desfeito ou NAO_REGISTRADO não conta), a série vai para ele e a confirmação diz qual foi assumido; senão, a série é gravada pendente, com motivo SEM_EXERCICIO e sem botões, e a confirmação pede para reenviar com o nome do exercício ou usar **Desfazer**. *(D15 e D21 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 - 6d. Relato de drop set: uma única série com etapas, cada uma com carga e repetições, na ordem dita (US-17). Carga não dita fica vazia, nunca copiada da etapa anterior.
 - 6e. O testador disse aquecimento ou preparatória: a série recebe esse tipo. Aquecimento geral (esteira, mobilidade) vai para a observação da sessão (US-18).
 - 6f. O relato traz dor ou lesão: o sistema anota sem diagnosticar, a confirmação sugere procurar um profissional de saúde e não recomenda o que fazer com a carga (RT-01).
+- 6g. Erro inesperado ao gravar (falha que não é da validação): o relato fica NAO_REGISTRADO, motivo ERRO_INTERNO, o texto fica guardado e o testador recebe o aviso de reenviar. *(D19 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 
-**Pós-condição de sucesso:** o relato está registrado em uma sessão, o texto original está guardado e o testador recebeu a confirmação.
-**Pós-condição de falha:** o texto original continua guardado, nenhuma série foi gravada e o testador sabe disso.
+**Pós-condição de sucesso:** o relato está registrado em uma sessão, o texto bruto está guardado e o testador recebeu a confirmação.
+**Pós-condição de falha:** o texto bruto continua guardado, nenhuma série foi gravada e o testador sabe disso.
 
 **Regras:** "NxM", carga, tipo de série, falha e texto livre estão em `01-definicoes-de-dominio.md`; estados do relato em `04-ciclo-de-vida-do-registro.md` (atualizado em 01/11/2026 pela decisão 2).
 
@@ -71,20 +73,20 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 ## UC-02 Vincular exercício pendente
 
 - **Ator primário:** Testador.
-- **Pré-condição:** existe uma série pendente de vínculo, que não foi desfeita. *(Decisão 2, aceita em 01/11/2026: a série é gravada na hora, sem exercício; não há espera nem expiração.)*
+- **Pré-condição:** o testador está ATIVO e existe uma série pendente de vínculo, que não foi desfeita. *(Decisão 2, aceita em 01/11/2026: a série é gravada na hora, sem exercício; não há espera nem expiração.)*
 - **Gatilho:** o testador toca em um botão de candidata na confirmação.
 
 **Fluxo principal**
 1. O testador toca no botão do exercício correto.
-2. O sistema liga a série a esse exercício.
+2. O sistema liga a esse exercício todas as séries pendentes da mesma mensagem com o mesmo texto relatado, numa só transação. Séries de outras mensagens não mudam (as próximas casam pelo apelido). *(D14 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 3. O sistema responde dizendo a qual exercício a série foi vinculada.
 
 **Fluxos alternativos**
 - 1a. O testador toca duas vezes, ou o toque é entregue duas vezes: a segunda vez não muda nada (idempotente).
 - 1b. A série foi desfeita antes do toque: o sistema avisa que o registro não vale mais.
-- 1c. Nenhuma candidata é o exercício certo: a série continua pendente e o testador não precisa fazer nada; o administrador acrescenta o exercício à ficha pelo UC-10. Não há correção de vínculo no MVP: vínculo errado se corrige com **Desfazer** e reenvio. *(Decidido em 07/11/2026.)*
+- 1c. Nenhuma candidata é o exercício certo: a série continua pendente. Depois que o administrador cadastrar o exercício no catálogo (UC-10), o testador usa **Desfazer** e reenvia o relato. Depois de 24 horas o Desfazer vence; o testador só reenvia; a série pendente antiga fica fora das leituras e o reenvio conta como outro relato nas métricas (limite aceito). Não há vínculo retroativo: série pendente nunca vinculada fica fora de `/carga` e `/evolucao`. Não há correção de vínculo no MVP: vínculo errado se corrige com **Desfazer** e reenvio; depois de 24 horas não tem correção (aceito). *(Decidido em 07/11/2026; sem vínculo retroativo pelo D16 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 - 1d. O botão só vincula enquanto a série está pendente; depois disso o sistema responde a qual exercício ela já está ligada.
-- 2a. **Apelido (decidido em 01/11/2026):** se o texto do relato não casou com nenhum exercício (caso 6a), o vínculo cria um apelido do testador com esse texto, em minúsculas, apontando para o exercício escolhido. Se o texto era ambíguo (caso 6b, como "remada"), **nenhum apelido é criado**, porque nome ambíguo não vira apelido e o bot volta a perguntar da próxima vez.
+- 2a. **Apelido (decidido em 01/11/2026):** se o texto do relato não casou com nenhum exercício (caso 6a), o vínculo cria um apelido do testador com esse texto, em minúsculas, apontando para o exercício escolhido. Se o texto era ambíguo (caso 6b, como "remada"), **nenhum apelido é criado**, porque nome ambíguo não vira apelido e o bot volta a perguntar da próxima vez. O apelido é criado uma vez, mesmo quando o toque liga várias séries; se já existe apelido com esse texto, ele não é criado nem alterado, e o toque só vincula. *(D14 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 
 **Pós-condição:** a série está ligada a um exercício oficial do catálogo do testador, e ele sabe qual.
 
@@ -99,7 +101,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 **Fluxo principal (comando)**
 1. O testador envia `/desfazer`.
 2. O sistema seleciona a mensagem válida mais recente do testador, com registro, nas últimas 24 horas (consultas não contam).
-3. O sistema marca essa mensagem e as séries dela como desfeitas, sem apagar nada.
+3. O sistema marca a **mensagem** como desfeita, sem apagar nada; as séries herdam o estado (D6 de `06-modelo-de-dados.md`).
 4. O sistema responde listando o que saiu (data, exercícios, número de séries) e avisando se a sessão tem observação, que não é desfeita.
 
 **Fluxo principal (botão)**
@@ -115,7 +117,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 
 **Pós-condição:** o registro está marcado como desfeito (com data), preservado para o histórico e para a métrica de correções, e não aparece mais em nenhuma leitura (`/carga`, evolução).
 
-**Fora do MVP (decidido em 01/11/2026):** o desfazer é sempre da mensagem inteira, sem pedir confirmação. Desfazer parcial (por série ou por exercício) e um botão **Refazer** ficam para depois do teste, conforme o uso medido (quantas vezes se desfaz e por quê). O que o testador perde ao desfazer é só o trabalho de reenviar o relato, porque o texto original continua guardado.
+**Fora do MVP (decidido em 01/11/2026):** o desfazer é sempre da mensagem inteira, sem pedir confirmação. Desfazer parcial (por série ou por exercício) e um botão **Refazer** ficam para depois do teste, conforme o uso medido (quantas vezes se desfaz e por quê). O que o testador perde ao desfazer é só o trabalho de reenviar o relato, porque o texto bruto continua guardado.
 
 ---
 
@@ -152,16 +154,17 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 1. O testador envia `/evolucao <exercício>`.
 2. O sistema identifica o exercício como no UC-04.
 3. O sistema reúne as séries de **trabalho** do exercício, ignorando aquecimento, preparatórias e registros desfeitos.
-4. O sistema responde com a carga de trabalho por data, da mais antiga à mais recente, **sem filtro de período** (todas as sessões do exercício).
+4. O sistema responde com a carga de trabalho por sessão, com a data, da mais antiga à mais recente, **sem filtro de período** (todas as sessões do exercício).
 
 **Fluxos alternativos**
 - 2a. Nome ambíguo ou não reconhecido: como UC-04 (3a, 3b).
+- 2b. O exercício é ASSISTIDO, CORPORAL ou DURACAO: o sistema responde "ainda não acompanho a evolução desse tipo de exercício". `/carga` continua valendo para ele. *(D17 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 - 3a. Há menos de **3** sessões com carga de trabalho do exercício: o sistema avisa que ainda não há dados suficientes.
-- 4a. Para cada sessão, a maior carga normalizada entre as séries de trabalho (etapa 1), com as repetições da série em que ocorreu. Séries sem carga normalizada ficam de fora. Se houver unidades incomparáveis (kg e placa), mostra só a mais recente e avisa.
+- 4a. Para cada sessão, a maior carga normalizada entre as séries de trabalho (etapa 1), com as repetições da série em que ocorreu. Séries sem carga normalizada ficam de fora. Se houver unidades incomparáveis (kg e placa), mostra só a mais recente e avisa; o mínimo de 3 sessões conta só as sessões nessa unidade. *(D1 e D17 de `06-modelo-de-dados.md`.)*
 
 **Pós-condição:** o testador viu a evolução; o uso do comando é contado para a hipótese H3.
 
-*(Decidido em 01/11/2026: sem período e mínimo de 3 registros, como ponto de partida. Revisar depois da primeira semana de teste.)*
+*(Decidido em 01/11/2026: sem período e mínimo de 3 sessões, como ponto de partida. Revisar depois da primeira semana de teste.)*
 
 ---
 
@@ -174,14 +177,14 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 **Fluxo principal**
 1. A pessoa envia `/start`.
 2. O sistema cadastra a pessoa como PENDENTE, com nome, identificador do canal e data. Nunca grava o texto da mensagem. **[PREMISSA: decisão 5 de 28/10, sem página em `decisoes/`]**
-3. O sistema envia a boas-vindas com o aviso de dados: grava texto e treinos; é um banco de estudo; o texto passa pela API da Anthropic; pode pedir para apagar; o acesso depende de aprovação (US-11). O sistema registra a data do envio do aviso.
+3. O sistema envia a boas-vindas com o aviso de dados: grava texto e treinos; é um banco de estudo; o texto passa pela API da Anthropic; os dados podem ser analisados para entender padrões de uso; o bot só registra treino e não substitui profissional de saúde (PROVISÓRIO, para revisão do autor, A10 de `07-arquitetura.md`); pode pedir para apagar; o acesso depende de aprovação (US-11). O sistema registra a data do envio do aviso.
 4. O sistema avisa o administrador (UC-07).
 
 **Fluxos alternativos**
 - 1a. A pessoa já está PENDENTE: o sistema responde "aguardando aprovação" e avisa o administrador de novo.
 - 1b. A pessoa já está ATIVA: o sistema responde "já cadastrado".
 - 1c. A pessoa está BLOQUEADA: silêncio total.
-- 1d. A pessoa não cadastrada envia qualquer coisa que não seja `/start`: silêncio. Nada de quem não está ATIVO é guardado.
+- 1d. A pessoa não cadastrada envia qualquer coisa que não seja `/start`: silêncio. Nenhuma mensagem de quem não está ATIVO é guardada; o cadastro PENDENTE do `/start` é a única gravação.
 - 1e. A pessoa está PENDENTE e envia qualquer coisa que não seja `/start` (texto, outro comando ou toque de botão): silêncio. Nada é gravado; o sistema só confirma ao canal que recebeu a mensagem, para que ela não seja entregue de novo. *(Decidido em 07/11/2026: A16 de `07-arquitetura.md`.)*
 
 **Pós-condição:** a pessoa está PENDENTE e leu o aviso de dados.
@@ -191,7 +194,7 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 ## UC-07 Aprovar testador
 
 - **Ator primário:** Administrador.
-- **Pré-condição:** há um testador PENDENTE e o administrador recebeu o aviso (nome, identificador interno e o comando `/aprovar` pronto).
+- **Pré-condição:** há um testador PENDENTE e o administrador recebeu o aviso (nome, identificador interno e o comando `/aprovar` pronto). O primeiro administrador é criado por script, já ATIVO e com `eh_administrador` (A15 de `07-arquitetura.md`).
 - **Gatilho:** o administrador envia `/aprovar <id>`.
 
 **Fluxo principal**
@@ -207,13 +210,13 @@ Fase 2 (Projeto). Redigido em 01/11/2026 com assistência de IA (Claude) a parti
 - 3a. A pessoa já está ATIVA: o sistema avisa.
 - 3b. A pessoa está BLOQUEADA: o sistema orienta a desbloquear pelo banco. Bloquear e desbloquear são feitos direto no banco, sem story.
 
-**Pós-condição:** o testador está ATIVO e pode usar UC-01, 03, 04 e 05.
+**Pós-condição:** o testador está ATIVO e pode usar UC-01 a UC-05.
 
 ---
 
 ## UC-08 (rebaixado): tratar mensagem fora do assunto
 
-Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um desvio que acontece dentro do UC-01 (1a e 6f). Fica como regra transversal. *(Decidido em 01/11/2026.)*
+Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um desvio que acontece dentro do UC-01 (3b e 6f). Fica como regra transversal. *(Decidido em 01/11/2026.)*
 
 **RT-01 Mensagens fora do assunto** (US-10)
 - Xingamento: resposta curta e neutra, sem rebater. Nada é registrado como treino.
@@ -236,7 +239,7 @@ Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um 
 **Fluxo principal**
 1. O testador pede a exclusão dos dados.
 2. O administrador confirma que o pedido é do testador.
-3. O administrador apaga o **histórico** do testador (mensagens, sessões e séries, inclusive as desfeitas). Cadastro, ficha e apelidos ficam. Se o testador pediu para **sair**, apaga também cadastro, ficha e apelidos.
+3. O administrador apaga o **histórico** do testador (mensagens, sessões e séries, inclusive as desfeitas). Cadastro, catálogo e apelidos ficam. Se o testador pediu para **sair**, apaga também cadastro, catálogo e apelidos.
 4. O administrador descarta backups com mais de 30 dias e, se restaurar um backup, refaz as exclusões do registro privado.
 5. O administrador confirma ao testador que foi feito.
 
@@ -244,20 +247,20 @@ Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um 
 - 2a. Não é possível confirmar quem pediu: o pedido não é atendido.
 - 3a. Exclusão total: o testador só volta com novo `/start` e nova aprovação.
 
-**Pós-condição:** dentro do prazo de 7 dias corridos, nenhum histórico do testador permanece no banco (mensagens, sessões e séries); na exclusão total, também não permanecem cadastro, ficha e apelidos.
+**Pós-condição:** dentro do prazo de 7 dias corridos, nenhum histórico do testador permanece no banco (mensagens, sessões e séries); na exclusão total, também não permanecem cadastro, catálogo e apelidos.
 
 *(Fechado em 07/11/2026: D2 do `06-modelo-de-dados.md`.)*
 
 ---
 
-## UC-10 Cadastrar a ficha do testador
+## UC-10 Cadastrar o catálogo a partir da ficha do testador
 
 - **Ator primário:** Administrador.
 - **Pré-condição:** o testador está ATIVO e enviou a ficha de treino dele.
 - **Gatilho:** o administrador recebe a ficha.
 
 **Fluxo principal**
-1. O administrador confere os nomes dos exercícios, o grupamento e a forma da carga (por lado ou total) de cada um.
+1. O administrador confere o nome oficial, o tipo de registro e a forma da carga (por lado ou total) de cada exercício. *(D18 de `06-modelo-de-dados.md`, decidido em 08/11/2026 por delegação do autor.)*
 2. O administrador cadastra os exercícios do testador no catálogo e os apelidos dele.
 3. O administrador confere a contagem final de exercícios e apelidos.
 
@@ -293,8 +296,8 @@ Não é caso de uso próprio. Não há objetivo de ator que comece nisso; é um 
 2. **Apelido:** o vínculo cria apelido só quando o texto não casou com nenhum exercício; texto ambíguo nunca vira apelido.
 3. **UC-10 mantido como caso de uso;** a fronteira do sistema inclui o banco.
 4. **UC-08 vira regra (RT-01).**
-5. **Evolução (UC-05):** sem filtro de período, mínimo de 3 registros (ponto de partida, a revisar após a 1ª semana de teste).
-6. **Excluir cadastro, prazo e backup (UC-09):** adiados.
+5. **Evolução (UC-05):** sem filtro de período, mínimo de 3 sessões (ponto de partida, a revisar após a 1ª semana de teste).
+6. **Excluir cadastro, prazo e backup (UC-09):** adiados (fechado em 07/11/2026, D2).
 7. **Texto de emergência (RT-01):** aprovado. Deve ser texto fixo, nunca gerado pelo modelo.
 8. **Desfazer (UC-03):** sempre da mensagem inteira e sem confirmação no MVP. Desfazer parcial e Refazer ficam para depois do teste.
 9. **Comando de evolução:** `/evolucao` (sem acento, limitação do Telegram).

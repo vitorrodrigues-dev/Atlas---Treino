@@ -12,4 +12,4 @@ O bot guarda o contexto entre mensagens (US-02) no MVP.
 Ler cada mensagem isoladamente, deixando o contexto para o Pós-MVP.
 
 ## Consequências
-É preciso definir por quanto tempo o contexto vale e o que fazer quando o exercício é ambíguo. Aumenta a complexidade do extrator.
+O contexto vale por 30 minutos (definido em 27/10/2026); o que fazer quando o exercício é ambíguo ficou na decisão 2 de 01/11/2026. Aumenta a complexidade do extrator.

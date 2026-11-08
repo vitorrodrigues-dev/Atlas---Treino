@@ -53,7 +53,7 @@ Forma de interação: texto livre para relatar o treino; botões apenas para des
 | US-14 Evolução em tela de celular | Depende de validar o chatbot |
 | US-15 Site explicativo | Depende de validar o chatbot |
 | US-16 Uso sem ficha (iniciante) | Exige catálogo genérico e tom próprio |
-| Fotos e vídeos | Fora do canal de texto do MVP |
+| Qualquer conteúdo que não seja texto (foto, vídeo, figurinha, documento; áudio é a US-13) | Fora do canal de texto do MVP |
 | Sugestão de carga e dúvidas de treino | Visão do produto, não do primeiro incremento |
 | Bi-set e tri-set | Adiados; drop set cobre a técnica mais citada |
 | Abertura para alunos de academia | Exige revisão de privacidade antes (ver riscos) |
@@ -61,6 +61,16 @@ Forma de interação: texto livre para relatar o treino; botões apenas para des
 | Ficha de treino como entidade | O rótulo do treino (A, B, C) cobre o necessário no MVP |
 | Modalidade (corrida, cardio) | Cardio vai como texto na observação da sessão |
 | Importar base externa de exercícios | Licenças; o catálogo vem da ficha de cada testador |
+| Desfazer parcial (por série ou exercício) e botão Refazer | Decidir pelo uso medido no teste (casos de uso, UC-03) |
+| Correção de vínculo de exercício | Vínculo errado se corrige com Desfazer e reenvio (modelo de dados, D8) |
+| Vínculo retroativo de série pendente | O testador desfaz e reenvia depois que o exercício é cadastrado (modelo de dados, D16) |
+| Reprocessar relato NAO_REGISTRADO | O testador reenvia; só o relato RECEBIDO é reprocessado na subida (arquitetura, A12) |
+| Atributos descritivos do exercício e faixa-alvo de repetições | Nenhum caso de uso consome (modelo de dados, D5) |
+| Grupamento do exercício | Só a US-05, Pós-MVP, usaria (modelo de dados, D18) |
+| Evolução de exercícios ASSISTIDO, CORPORAL e DURACAO | Sem regra de "maior carga" que sirva a eles (modelo de dados, D17) |
+| Peso da barra e da plataforma | A carga é normalizada na forma padrão do exercício (modelo de dados, seção 7) |
+| Academia ou equipamento na série | Vai no texto livre da série (definições de domínio) |
+| Estruturar RIR e RPE | Ficam no texto livre da série até haver relatos reais da primeira semana de teste |
 
 ## Como saberemos se deu certo
 
@@ -76,7 +86,7 @@ Critérios do teste, com números ainda por definir antes de começar:
 ## Premissas e limites
 
 - A amostra da pesquisa é pequena e de conveniência; as preferências do formulário são hipóteses que o teste confirma ou contradiz.
-- O bot nunca inventa dados que o usuário não falou (RNF-01).
+- O bot nunca inventa dados que o usuário não falou (RNF-01). Exceção registrada: a unidade de carga não dita é lida como kg e mostrada na confirmação (D12 do modelo de dados).
 - Tecnologias e arquitetura são escolhidas na fase de Projeto, não aqui.
 
 ## Riscos
@@ -85,13 +95,16 @@ Critérios do teste, com números ainda por definir antes de começar:
 - **Extrator:** os relatos reais variam muito (faixas de repetição, carga vaga, erros de digitação). Pode ser preciso ajustar muito.
 - **Dor não comprovada:** a pesquisa não mostrou que o problema existe para quem treina com progressão de carga, e 65% dos respondentes não registram o treino hoje. O teste pode mostrar que o problema não é a ferramenta. Antes do teste, conversas curtas com quem aceitou falar (ver `02`).
 - **Texto contra botões:** a pesquisa favoreceu botões. Se os testadores abandonarem o texto livre, a aposta de H1 falhou.
-- **Viés de cortesia e novidade:** testadores conhecidos tendem a usar por gentileza, e o interesse cai depois das primeiras semanas. Métricas só da 2ª semana em diante, sem contar o autor.
+- **Viés de cortesia e novidade:** testadores conhecidos tendem a usar por gentileza, e o interesse cai depois das primeiras semanas. Métricas de retenção e de evolução só da 2ª semana em diante; a ativação (um treino na primeira semana) vale desde o início. O autor não conta em nenhuma delas.
 - **Indisponibilidade do bot:** se o serviço estiver desligado (por exemplo, o computador que o hospeda), a retenção medida fica distorcida. Registrar os períodos fora do ar.
 - **Dependência do uso de IA:** custo e disponibilidade da API afetam o teste.
 
 ## Decisões pendentes
 
 - Valores dos critérios de sucesso acima.
-- Validar a janela de 30 minutos (contexto da US-02) depois da primeira semana de teste.
-- Prazo e método da exclusão de dados (US-12), incluindo o backup. Fechado: 7 dias corridos (D2 do modelo de dados).
 - Revisão da retenção e do aviso de privacidade antes de abrir além dos testadores.
+
+## Decisões fechadas
+
+- Prazo e método da exclusão de dados (US-12), incluindo o backup: 7 dias corridos (D2 do modelo de dados, 07/11/2026).
+- Janela de contexto da US-02: 30 minutos, contados pelo envio da mensagem (D21 do modelo de dados, decidido em 08/11/2026 por delegação do autor). Rever depois da primeira semana de teste é ajuste normal, não pendência.
