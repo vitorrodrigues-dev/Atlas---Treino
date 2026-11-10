@@ -16,11 +16,12 @@
 - [x] Casos de uso (aceitos em 01/11/2026): [documento](02-projeto/05-casos-de-uso.md)
 - [x] Modelo de dados: [documento](02-projeto/06-modelo-de-dados.md)
 - [x] Arquitetura: [documento](02-projeto/07-arquitetura.md)
-- [ ] Revisão de consistência: relatório feito em 08/11/2026, correções em andamento (decisões D14 a D21 no modelo)
-- [ ] Inventário de restrições: rascunho feito, aguardando as respostas do autor (orçamento, acesso ao Oracle da FIAP, notebook ligado, cronograma, local de processamento da API)
-- [ ] Escolha de tecnologias (por último, com o inventário de restrições: banco, custo da API, hospedagem, tempo)
+- [x] Revisão de consistência: relatório de 08/11/2026, correções aplicadas (decisões D14 a D21 no modelo)
+- [ ] Inventário de restrições: [rascunho](02-projeto/08-inventario-de-restricoes.md) feito; falta refletir as respostas de 10/11/2026 (orçamento do MVP, Oracle da FIAP fora, PostgreSQL)
+- [x] Escolha de tecnologias (aceita em 10/11/2026): [documento](02-projeto/09-escolha-de-tecnologias.md)
 - Pendências de entrada: as decisões 2 a 5 de 28/10 ainda não têm página em `decisoes/` (a 2 e a 4 mudaram de texto em 01/11/2026, ver o fim dos casos de uso). A decisão 3 não está descrita em nenhum documento.
-- Próximo passo: ler o relatório das correções, commitar, responder o inventário e então escolher tecnologias.
+- Pendências da escolha de tecnologias: cronograma contra a pilha (precisa das horas por semana até dezembro), notebook ligado durante o teste, local da cópia semanal do banco. Lista completa na seção 4 do `09`.
+- Próximo passo: atualizar o inventário (`08`) com as respostas de 10/11, fechar a pendência do cronograma e então começar a Fase 3 (Construção).
 
 ## Fase 3: Construção (a fazer)
 
